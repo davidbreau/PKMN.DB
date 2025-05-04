@@ -1,0 +1,52 @@
+E1. Gestion des données
+C1. Extraction de données
+Développer un scraper pour PokéAPI (RESTful API)
+Développer un scraper pour Bulbapedia/Pokémon Showdown (données de jeu compétitif)
+Développer un scraper pour Pokémon GO Hub (données spécifiques à Pokémon GO)
+Développer un extracteur pour les fichiers CSV/JSON de données Pokémon existants
+Implémenter un système de gestion d'erreurs et de logs pour les scrapers
+C2. Requêtes SQL
+Concevoir les requêtes pour extraire les données statistiques des Pokémon
+Concevoir les requêtes pour extraire les relations d'évolution
+Implémenter des requêtes optimisées pour récupérer les données de combats
+C3. Agrégation des données
+Développer un script pour unifier les formats de données entre les différentes sources
+Implémenter un système de nettoyage pour les données incohérentes ou manquantes
+Créer un script pour enrichir les données avec les relations d'évolution
+Normaliser toutes les statistiques selon une échelle commune
+C4. Création de la base de données
+Concevoir le modèle conceptuel des données (MCD) pour les Pokémon et leurs statistiques
+Concevoir le modèle physique pour stocker les données d'évolution
+Implémenter la base de données avec respect du RGPD
+Créer des scripts d'import pour peupler la base de données
+C5. Développement d'API
+Développer une API REST pour accéder aux données des Pokémon
+Implémenter un système d'authentification pour l'API
+Créer des endpoints pour les statistiques et prédictions d'évolution
+Documenter l'API selon les standards OpenAPI
+E2. Veille service IA
+C6-C7. Veille technique et Identification de services IA
+Réaliser une veille sur les modèles de prédiction de séries numériques
+Comparer les différents services d'IA capables de prédire plusieurs valeurs (statistiques)
+Étudier les algorithmes de Machine Learning adaptés à la prédiction des statistiques d'évolution
+Faire un benchmark des services existants pour la prédiction de valeurs numériques
+C8. Paramétrage d'un service IA
+Configurer un service de ML pour l'entraînement sur les données d'évolution
+Paramétrer le modèle pour prédire les 6 statistiques (HP, Attaque, Défense, etc.)
+Mettre en place le monitoring du service
+E3. Mise à disposition de l'IA
+C9-C13. Développement, intégration et monitoring du modèle d'IA
+Développer une API exposant le modèle de prédiction des évolutions
+Intégrer l'API d'IA dans l'application Pokédex
+Mettre en place un système de feedback pour améliorer les prédictions
+Créer les tests automatisés pour le modèle d'IA
+Configurer une chaîne de livraison continue pour le modèle
+E4. Développement de l'application
+C14-C19. Conception et développement de l'application
+Analyser les besoins spécifiques de l'application Pokédex augmentée
+Concevoir l'architecture technique de l'application
+Développer l'interface utilisateur du Pokédex
+Implémenter le bouton "Prédire évolution" et l'affichage des résultats
+Créer une visualisation comparative des statistiques actuelles/prédites
+Mettre en place les tests automatisés pour l'application
+Configurer une chaîne de livraison continue pour l'application

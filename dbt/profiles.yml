@@ -1,0 +1,19 @@
+pkmn_db:
+  target: dev
+  outputs:
+    dev:
+      type: sqlite
+      threads: 1
+      database: "pkmn_db.sqlite"
+      schema: main
+      
+    # Pour plus tard, si vous passez à une base de données plus robuste
+    # prod:
+    #   type: postgres
+    #   host: localhost
+    #   port: 5432
+    #   user: postgres
+    #   password: password
+    #   dbname: pokemon_db
+    #   schema: public
+    #   threads: 4 

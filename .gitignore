@@ -175,3 +175,10 @@ cython_debug/
 
 # Cursor rules
 .cursor/rules/
+
+# Uv
+uv.lock
+
+# Qodo
+.qodo
+

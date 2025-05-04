@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS types (
+    id INTEGER PRIMARY KEY,
+    name VARCHAR(20) NOT NULL UNIQUE,
+    name_fr VARCHAR(20) NULL UNIQUE,
+    generation INTEGER
+);
+
+
