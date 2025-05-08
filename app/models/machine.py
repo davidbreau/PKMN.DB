@@ -2,7 +2,8 @@ from typing import Optional, TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
-    from models import Move, Game
+    from .move import Move
+    from .game import Game
 
 class Machine(SQLModel, table=True):
     __tablename__ = "machines"

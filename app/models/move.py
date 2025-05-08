@@ -2,7 +2,8 @@ from typing import List, TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
-    from models import Machine, PokemonLearnset
+    from .machine import Machine
+    from .pokemon_learnset import PokemonLearnset
 
 class Move(SQLModel, table=True):
     __tablename__ = "moves"

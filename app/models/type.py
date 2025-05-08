@@ -2,7 +2,8 @@ from typing import List, TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
-    from models import Pokemon, TypeEffectiveness
+    from .pokemon import Pokemon
+    from .type_effectiveness import TypeEffectiveness
 
 class Type(SQLModel, table=True):
     __tablename__ = "types"

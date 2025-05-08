@@ -2,7 +2,7 @@ from typing import List, TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
-    from pokemon_ability import PokemonAbility
+    from .pokemon_ability import PokemonAbility
 
 class Ability(SQLModel, table=True):
     __tablename__ = "abilities"
