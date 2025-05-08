@@ -15,5 +15,5 @@ class TypeEffectiveness(SQLModel, table=True):
     effectiveness: float = Field(sa_type=Float(precision=2, asdecimal=False))
     
     # RELATIONSHIPS
-    attacking_type: "Type" = Relationship(foreign_keys=[attacking_type_id])
-    defending_type: "Type" = Relationship(foreign_keys=[defending_type_id]) 
+    attacking_type: "Type" = Relationship(back_populates="attacking_effectiveness", sa_relationship_kwargs={"primaryjoin": "TypeEffectiveness.attacking_type_id == Type.id"})
+    defending_type: "Type" = Relationship(back_populates="defending_effectiveness", sa_relationship_kwargs={"primaryjoin": "TypeEffectiveness.defending_type_id == Type.id"}) 
