@@ -1,6 +1,6 @@
 -- Table des sprites de Pokémon
 CREATE TABLE IF NOT EXISTS pokemon_sprites (
-    id SERIAL PRIMARY KEY,
+    pokemon_id SERIAL PRIMARY KEY,
     pokemon_name VARCHAR(100) NOT NULL,
     
     -- Sprites par défaut
@@ -22,6 +22,6 @@ CREATE TABLE IF NOT EXISTS pokemon_sprites (
     
     -- Pokémon GO (à remplir si disponible)
     pokemon_go TEXT,
-    pokemon_go_shiny TEXT,
+    pokemon_go_shiny TEXT
     
 );

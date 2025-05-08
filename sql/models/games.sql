@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS games (
     generation_number INTEGER NOT NULL,
     generation_name VARCHAR(50) NOT NULL,
     version_group VARCHAR(50) NOT NULL,
-    region_name VARCHAR(50) NOT NULL,
-    release_year INTEGER
+    region_name VARCHAR(50) NOT NULL
 );
+ 

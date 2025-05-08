@@ -5,11 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "dbt-core>=1.9.4",
-    "dbt-sqlite>=1.9.1",
     "ipykernel>=6.29.5",
     "polars>=1.29.0",
     "scrapy>=2.12.0",
+    "sqlmodel>=0.0.24",
+    "supabase>=2.15.1",
     "ujson>=5.10.0",
 ]
 

@@ -49,4 +49,4 @@ Développer l'interface utilisateur du Pokédex
 Implémenter le bouton "Prédire évolution" et l'affichage des résultats
 Créer une visualisation comparative des statistiques actuelles/prédites
 Mettre en place les tests automatisés pour l'application
-Configurer une chaîne de livraison continue pour l'application
+Configurer une chaîne de livraison continue pour l'applicatione
