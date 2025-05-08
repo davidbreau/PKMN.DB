@@ -1,32 +1,38 @@
-from typing import Optional
+from typing import TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
+
+if TYPE_CHECKING:
+    from models import Pokemon
 
 class PokedexNumber(SQLModel, table=True):
     __tablename__ = "pokedex_numbers"
     
-    pokemon_id: int = Field(primary_key=True, foreign_key="pokemon_details.id")
-    national: Optional[int] = None
-    kanto: Optional[int] = None
-    original_johto: Optional[int] = None
-    updated_johto: Optional[int] = None
-    hoenn: Optional[int] = None
-    original_sinnoh: Optional[int] = None
-    extended_sinnoh: Optional[int] = None
-    unova_bw: Optional[int] = None
-    unova_b2w2: Optional[int] = None
-    kalos_central: Optional[int] = None
-    kalos_coastal: Optional[int] = None
-    kalos_mountain: Optional[int] = None
-    alola: Optional[int] = None
-    melemele: Optional[int] = None
-    akala: Optional[int] = None
-    ulaula: Optional[int] = None
-    poni: Optional[int] = None
-    galar: Optional[int] = None
-    isle_of_armor: Optional[int] = None
-    crown_tundra: Optional[int] = None
-    hisui: Optional[int] = None
-    paldea: Optional[int] = None
+    # COLUMNS
+    pokemon_id: int = Field(primary_key=True, foreign_key="pokemons.id")
+    national: int | None = None
+    kanto: int | None = None
+    original_johto: int | None = None
+    updated_johto: int | None = None
+    hoenn: int | None = None
+    original_sinnoh: int | None = None
+    extended_sinnoh: int | None = None
+    unova_bw: int | None = None
+    unova_b2w2: int | None = None
+    kalos_central: int | None = None
+    kalos_coastal: int | None = None
+    kalos_mountain: int | None = None
+    alola: int | None = None
+    melemele: int | None = None
+    akala: int | None = None
+    ulaula: int | None = None
+    poni: int | None = None
+    galar: int | None = None
+    isle_of_armor: int | None = None
+    crown_tundra: int | None = None
+    hisui: int | None = None
+    paldea: int | None = None
     
-    # Relationship can be added later
-    # pokemon: "PokemonDetails" = Relationship(back_populates="pokedex_number") 
+    # RELATIONSHIPS
+    pokemon: "Pokemon" = Relationship(back_populates="pokedex_numbers")
+    
+ 
