@@ -2,8 +2,8 @@ from typing import List, TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
-    from .machine import Machine
-    from .pokemon_learnset import PokemonLearnset
+from .machine import Machine
+from .pokemon_learnset import PokemonLearnset
 
 class Move(SQLModel, table=True):
     __tablename__ = "moves"
@@ -19,5 +19,10 @@ class Move(SQLModel, table=True):
     generation: int | None = None
     
     # RELATIONSHIPS
-    machines: List["Machine"] = Relationship(back_populates="move")
-    learnsets: List["PokemonLearnset"] = Relationship(back_populates="move") 
+    id___Machine__move_id: List["Machine"] = Relationship(
+        back_populates="move_id___Move__id"
+    )
+
+    id___PokemonLearnset__move_id: List["PokemonLearnset"] = Relationship(
+        back_populates="move_id___Move__id"
+    )

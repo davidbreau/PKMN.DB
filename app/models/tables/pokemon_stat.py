@@ -2,15 +2,13 @@ from typing import TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
-    from .pokemon import Pokemon
+from .pokemon import Pokemon
 
 class PokemonStat(SQLModel, table=True):
     __tablename__ = "pokemon_stats"
     
     # COLUMNS
-    id: int | None = Field(default=None, primary_key=True)
-    pokemon_name: str = Field(max_length=100)
-    pokemon_id: int = Field(foreign_key="pokemons.id", index=True)
+    pokemon_id: int = Field(primary_key=True, foreign_key="pokemons.id")
     hp: int
     attack: int
     defense: int
@@ -19,4 +17,8 @@ class PokemonStat(SQLModel, table=True):
     speed: int
     
     # RELATIONSHIPS
-    pokemon: "Pokemon" = Relationship(back_populates="stats") 
+    pokemon_id___Pokemon__id: "Pokemon" = Relationship(
+        back_populates="id___PokemonStat__pokemon_id"
+    )
+
+    

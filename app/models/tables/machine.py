@@ -1,4 +1,4 @@
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
@@ -12,9 +12,16 @@ class Machine(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True)
     machine_number: str = Field(max_length=10)
     move_id: int = Field(foreign_key="moves.id")
-    move_name: Optional[str] = Field(default=None, max_length=100)
-    version_group: str = Field(max_length=50, index=True)
+    move_name: str | None = Field(default=None, max_length=100)
+    version_group: str = Field(max_length=50, foreign_key="games.version_group", index=True)
     
     # RELATIONSHIPS
-    move: "Move" = Relationship(back_populates="machines")
-    game: "Game" = Relationship(back_populates="machines", sa_relationship_kwargs={"primaryjoin": "Machine.version_group == Game.version_group"}) 
+    move_id___Move__id: "Move" = Relationship(
+        back_populates="id___Machine__move_id"
+    )
+    version_group___Game__version_group: "Game" = Relationship(
+        back_populates="version_group___Machine__version_group"
+    )
+
+ 
+ 

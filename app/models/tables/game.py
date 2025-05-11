@@ -1,4 +1,4 @@
-from typing import Optional, List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
@@ -17,5 +17,10 @@ class Game(SQLModel, table=True):
     region_name: str = Field(max_length=50)
     
     # RELATIONSHIPS
-    machines: List["Machine"] = Relationship(back_populates="game", sa_relationship_kwargs={"primaryjoin": "Game.version_group == Machine.version_group"})
-    pokemon_learnsets: List["PokemonLearnset"] = Relationship(back_populates="game", sa_relationship_kwargs={"primaryjoin": "Game.version_group == PokemonLearnset.version_group"}) 
+    version_group___Machine__version_group: List["Machine"] = Relationship(
+        back_populates="version_group___Game__version_group"
+    )
+
+    version_group___PokemonLearnset__version_group: List["PokemonLearnset"] = Relationship(
+        back_populates="version_group___Game__version_group"
+    )

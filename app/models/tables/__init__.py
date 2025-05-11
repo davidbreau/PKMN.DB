@@ -13,7 +13,7 @@ from .pokemon_stat import PokemonStat
 from .type import Type
 from .type_effectiveness import TypeEffectiveness
 
-__all__ = [
+__all_tables__ = [
     'Ability',
     'Evolution',
     'Game',

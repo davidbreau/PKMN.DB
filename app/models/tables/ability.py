@@ -9,11 +9,19 @@ class Ability(SQLModel, table=True):
     
     # COLUMNS
     id: int = Field(primary_key=True)
-    name_en: str = Field(unique=True)
-    name_fr: str | None = Field(default=None, unique=True)
+    name: str = Field(max_length=30, unique=True)
+    name_fr: str | None = Field(default=None, max_length=30, unique=True)
     effect: str | None = Field(default=None, max_length=1000)
     effect_fr: str | None = Field(default=None, max_length=1000)
     generation: int | None = None
     
     # RELATIONSHIPS
-    pokemon_abilities: List["PokemonAbility"] = Relationship(back_populates="ability") 
+    id___PokemonAbility__ability_id: List["PokemonAbility"] = Relationship(
+        back_populates="ability_id___Ability__id",
+        sa_relationship_kwargs={"foreign_keys": "[PokemonAbility.ability_id]"}
+    )
+    
+    name___PokemonAbility__ability_name: List["PokemonAbility"] = Relationship(
+        back_populates="ability_name___Ability__name",
+        sa_relationship_kwargs={"foreign_keys": "[PokemonAbility.ability_name]"}
+    )

@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
-    from .pokemon import Pokemon
+from .pokemon import Pokemon
 
 class PokedexNumber(SQLModel, table=True):
     __tablename__ = "pokedex_numbers"
@@ -33,6 +33,9 @@ class PokedexNumber(SQLModel, table=True):
     paldea: int | None = None
     
     # RELATIONSHIPS
-    pokemon: "Pokemon" = Relationship(back_populates="pokedex_numbers")
+    pokemon_id___Pokemon__id: "Pokemon" = Relationship(
+        back_populates="id___PokedexNumber__pokemon_id"
+    )
+
     
  

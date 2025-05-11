@@ -23,12 +23,7 @@ class LocalDatabase:
     
     def build(self, db_path: Path = LOCAL_DB_PATH):
         """Construit la base de données avec les tables."""
-        from app.models.tables import (
-            Ability, Evolution, Game, Machine, Move, 
-            PokedexNumber, PokemonAbility, PokemonDetail, 
-            PokemonLearnset, PokemonSprite, PokemonStat, 
-            Pokemon, TypeEffectiveness, Type
-        )
+        from app.models.tables import __all_tables__
         
         logging.info(f"Construction de la base de données {db_path}...")
         with engine.connect(str(db_path)) as session:

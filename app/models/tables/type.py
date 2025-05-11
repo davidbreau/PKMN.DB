@@ -1,9 +1,9 @@
-from typing import List, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
-    from .pokemon import Pokemon
-    from .type_effectiveness import TypeEffectiveness
+from .pokemon import Pokemon
+from .type_effectiveness import TypeEffectiveness
 
 class Type(SQLModel, table=True):
     __tablename__ = "types"
@@ -15,20 +15,20 @@ class Type(SQLModel, table=True):
     generation: int | None = None
     
     # RELATIONSHIPS
-    # Relations avec Pokémon
-    pokemons_primary: List["Pokemon"] = Relationship(
-        sa_relationship_kwargs={"primaryjoin": "Type.id == Pokemon.type_1_id", "backref": "type_1"}
+    id___Pokemon__type_1_id: List["Pokemon"] = Relationship(
+        back_populates="type_1_id___Type__id",
+        sa_relationship_kwargs={"foreign_keys": "[Pokemon.type_1_id]"}
     )
-    pokemons_secondary: List["Pokemon"] = Relationship(
-        sa_relationship_kwargs={"primaryjoin": "Type.id == Pokemon.type_2_id", "backref": "type_2"}
+    id___Pokemon__type_2_id: Optional[List["Pokemon"]] = Relationship(
+        back_populates="type_2_id___Type__id",
+        sa_relationship_kwargs={"foreign_keys": "[Pokemon.type_2_id]"}
     )
     
-    # Relations avec TypeEffectiveness
-    attacking_effectiveness: List["TypeEffectiveness"] = Relationship(
-        back_populates="attacking_type", 
-        sa_relationship_kwargs={"primaryjoin": "Type.id == TypeEffectiveness.attacking_type_id"}
+    id___TypeEffectiveness__attacking_type_id: List["TypeEffectiveness"] = Relationship(
+        back_populates="attacking_type_id___Type__id",
+        sa_relationship_kwargs={"foreign_keys": "[TypeEffectiveness.attacking_type_id]"}
     )
-    defending_effectiveness: List["TypeEffectiveness"] = Relationship(
-        back_populates="defending_type", 
-        sa_relationship_kwargs={"primaryjoin": "Type.id == TypeEffectiveness.defending_type_id"}
-    ) 
+    id___TypeEffectiveness__defending_type_id: List["TypeEffectiveness"] = Relationship(
+        back_populates="defending_type_id___Type__id",
+        sa_relationship_kwargs={"foreign_keys": "[TypeEffectiveness.defending_type_id]"}
+    )

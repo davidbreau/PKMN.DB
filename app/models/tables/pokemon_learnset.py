@@ -1,4 +1,4 @@
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from sqlmodel import Field, SQLModel, Relationship
 
 if TYPE_CHECKING:
@@ -16,9 +16,17 @@ class PokemonLearnset(SQLModel, table=True):
     move_name: str = Field(max_length=100)
     method: str = Field(max_length=100)
     level: int | None = None
-    version_group: str = Field(max_length=100, index=True)
+    version_group: str = Field(foreign_key="games.version_group", max_length=100, index=True)
     
     # RELATIONSHIPS
-    pokemon: "Pokemon" = Relationship(back_populates="learnsets")
-    move: "Move" = Relationship(back_populates="learnsets")
-    game: "Game" = Relationship(back_populates="pokemon_learnsets", sa_relationship_kwargs={"primaryjoin": "PokemonLearnset.version_group == Game.version_group"}) 
+    pokemon_id___Pokemon__id: "Pokemon" = Relationship(
+        back_populates="id___PokemonLearnset__pokemon_id"
+    )
+    
+    move_id___Move__id: "Move" = Relationship(
+        back_populates="id___PokemonLearnset__move_id"
+    )
+
+    version_group___Game__version_group: "Game" = Relationship(
+        back_populates="version_group___PokemonLearnset__version_group"
+    )
