@@ -10,3 +10,7 @@ class EndPoint(Enum):
     GAME = "version"
     EVOLUTION_CHAIN = "evolution-chain"
     POKEMON_SPECIES = "pokemon-species" 
+    VERSION_GROUP = "version-group"
+    GENERATION = "generation"
+    REGION = "region"
+    MACHINE = "machine" 

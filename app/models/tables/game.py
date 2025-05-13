@@ -12,8 +12,8 @@ class Game(SQLModel, table=True):
     id: int = Field(default=None, primary_key=True) 
     name: str = Field(max_length=50)
     generation_number: int
-    generation_name: str = Field(max_length=50)
-    version_group: str = Field(max_length=50, unique=True)
+    generation_name: str | None = Field(default=None, max_length=50)  # Gardé comme string mais optionnel
+    version_group: str = Field(max_length=50)
     region_name: str = Field(max_length=50)
     
     # RELATIONSHIPS
