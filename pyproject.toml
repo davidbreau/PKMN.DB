@@ -12,6 +12,7 @@ dependencies = [
     "supabase>=2.15.1",
     "ujson>=5.10.0",
     "typer>=0.9.0",
+    "roman>=5.0",
 ]
 
 [dependency-groups]

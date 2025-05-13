@@ -3,7 +3,7 @@ from sqlmodel import Field, SQLModel, Relationship
 from sqlalchemy import Float
 
 if TYPE_CHECKING:
-from .type import Type
+    from .type import Type
 
 class TypeEffectiveness(SQLModel, table=True):
     __tablename__ = "types_effectiveness"

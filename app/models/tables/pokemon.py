@@ -24,7 +24,7 @@ class Pokemon(SQLModel, table=True):
     sprite_url: str | None = Field(default=None, max_length=255)
     cry_url: str | None = Field(default=None, max_length=255)
     
-    # RELATIONSHIPS    
+    # RELATIONSHIPS
     type_1_id___Type__id: "Type" = Relationship(
         back_populates="id___Pokemon__type_1_id",
         sa_relationship_kwargs={"foreign_keys": "[Pokemon.type_1_id]"}
@@ -66,4 +66,3 @@ class Pokemon(SQLModel, table=True):
     id___PokemonAbility__pokemon_id: List["PokemonAbility"] = Relationship(
         back_populates="pokemon_id___Pokemon__id"
     )
-    
