@@ -7,4 +7,6 @@ class EndPoint(Enum):
     ABILITY = "ability" 
     MOVE = "move"
     ITEM = "item"
-    GAME = "version" 
+    GAME = "version"
+    EVOLUTION_CHAIN = "evolution-chain"
+    POKEMON_SPECIES = "pokemon-species" 
