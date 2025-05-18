@@ -11,7 +11,7 @@ class Move(SQLModel, table=True):
     # COLUMNS
     id: int = Field(primary_key=True)
     name: str = Field(max_length=100, unique=True)
-    name_fr: str | None = Field(default=None, max_length=100, unique=True)
+    name_fr: str | None = Field(default=None, max_length=100)
     damage: int | None = None
     precision: int | None = None
     damage_class: str | None = Field(default=None, max_length=50)

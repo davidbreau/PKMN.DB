@@ -10,15 +10,15 @@ import time
 from sqlmodel import Session, SQLModel, create_engine
 
 # Configuration variables
-LIMIT_IMPORT = True
-IMPORT_LIMIT = 20
+LIMIT_IMPORT = False
+IMPORT_LIMIT = None
 
 logger = logging.getLogger(__name__)
 
-# Default path for test database
-TEST_DB_PATH = Path('app/db/test.db')
+# Default path for PKMN.db database
+DB_PATH = Path('app/db/PKMN.db')
 # Create SQLAlchemy engine directly
-SQLITE_URL = f"sqlite:///{TEST_DB_PATH}"
+SQLITE_URL = f"sqlite:///{DB_PATH}"
 engine = create_engine(SQLITE_URL, connect_args={"check_same_thread": False})
 # use standard SQLAlchemy engine
 
@@ -228,7 +228,7 @@ if __name__ == "__main__":
     # Create and run importer
     importer = EvolutionImporter()
     # Use the configuration variables
-    evolutions = importer.import_all(limit=IMPORT_LIMIT if LIMIT_IMPORT else None)
+    evolutions = importer.import_all()
     
     # Print summary
     print(f"Successfully imported {len(evolutions)} evolution records.")

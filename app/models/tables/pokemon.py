@@ -18,7 +18,7 @@ class Pokemon(SQLModel, table=True):
     id: int = Field(primary_key=True)
     national_pokedex_number: int
     name_en: str = Field(max_length=100, unique=True)
-    name_fr: str | None = Field(default=None, max_length=100, unique=True)
+    name_fr: str | None = Field(default=None, max_length=100)
     type_1_id: int = Field(foreign_key="types.id")
     type_2_id: int | None = Field(default=None, foreign_key="types.id")
     sprite_url: str | None = Field(default=None, max_length=255)

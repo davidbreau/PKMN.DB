@@ -10,7 +10,7 @@ class Ability(SQLModel, table=True):
     # COLUMNS
     id: int = Field(primary_key=True)
     name: str = Field(max_length=30, unique=True)
-    name_fr: str | None = Field(default=None, max_length=30, unique=True)
+    name_fr: str | None = Field(default=None, max_length=30)
     effect: str | None = Field(default=None, max_length=1000)
     effect_fr: str | None = Field(default=None, max_length=1000)
     generation: int | None = None

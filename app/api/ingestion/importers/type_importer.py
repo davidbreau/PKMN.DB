@@ -13,10 +13,10 @@ from app.db.engine import engine as engine_factory
 
 logger = logging.getLogger(__name__)
 
-# Default path for test database
-TEST_DB_PATH = Path('app/db/test.db')
+# Default path for PKMN.db database
+DB_PATH = Path('app/db/PKMN.db')
 # Create SQLAlchemy engine directly
-SQLITE_URL = f"sqlite:///{TEST_DB_PATH}"
+SQLITE_URL = f"sqlite:///{DB_PATH}"
 engine = create_engine(SQLITE_URL, connect_args={"check_same_thread": False})
 # use standard SQLAlchemy engine
 

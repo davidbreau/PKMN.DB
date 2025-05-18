@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from .ability import Ability
 
 class PokemonAbility(SQLModel, table=True):
-    __tablename__ = "pokemons_abilities"
+    __tablename__ = "pokemon_abilities"
     
     # COLUMNS
     pokemon_id: int = Field(foreign_key="pokemons.id", primary_key=True)

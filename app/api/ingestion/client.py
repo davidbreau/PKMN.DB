@@ -84,7 +84,23 @@ class PokeApiClient:
         return self.call(endpoint, limit=total_count).get("results", [])
         # fetch all items at once
     
-    def get_items_generator(self, endpoint: EndPoint, batch_size: int = 20) -> Generator[Tuple[int, Dict[str, Any]], None, None]:
+    def extract_id_from_url(self, url: str) -> Optional[int]:
+        """ Extract the ID from a PokeAPI URL.
+        Args:
+            url: The URL to extract ID from
+        Returns:
+            The extracted ID or None if not found
+        """
+        if not url:
+            return None
+            
+        # URL format is usually like: https://pokeapi.co/api/v2/pokemon/1/
+        try:
+            return int(url.rstrip("/").split("/")[-1])
+        except (ValueError, IndexError):
+            return None
+    
+    def get_items_generator(self, endpoint: EndPoint, batch_size: int = 50) -> Generator[Tuple[int, Dict[str, Any]], None, None]:
         """ Generate items one by one with their index, handling rate limiting
         Args:
             endpoint: The API endpoint to retrieve items from
@@ -92,17 +108,41 @@ class PokeApiClient:
             
         Returns:
             Generator yielding (index, item_data) tuples """
-        all_items = self.get_all_items(endpoint)
+        # Get total count first
+        response = self.call(endpoint, limit=1)
+        total_count = response.get("count", 0)
+        self.logger.info(f"Found {total_count} items from {endpoint.value}")
         
-        for i, item_info in enumerate(all_items, 1):
-            resource_id = str(i)
-            self.logger.info(f"Fetching details for {endpoint.value} {resource_id}")
+        # Retrieve items in batches
+        offset = 0
+        while offset < total_count:
+            batch = self.call(endpoint, limit=batch_size, offset=offset)
+            results = batch.get("results", [])
             
-            item_data = self.call(endpoint, resource_id=resource_id)
-            yield i, item_data
+            if not results:
+                break
+                
+            for item_info in results:
+                # Extract ID from URL instead of using index
+                url = item_info.get("url", "")
+                item_id = self.extract_id_from_url(url)
+                
+                if not item_id:
+                    self.logger.warning(f"Could not extract ID from URL: {url}")
+                    continue
+                
+                try:
+                    self.logger.info(f"Fetching details for {endpoint.value} {item_id}")
+                    item_data = self.call(endpoint, resource_id=str(item_id))
+                    yield item_id, item_data
+                    
+                    time.sleep(self.rate_limit_delay)
+                except Exception as e:
+                    self.logger.error(f"Error fetching {endpoint.value} {item_id}: {e}")
+                    # Continue with next item instead of breaking completely
+                    continue
             
-            time.sleep(self.rate_limit_delay)
-        # yield items one by one with rate limiting
+            offset += batch_size
     
     @staticmethod
     def batch_ingest(items_generator: Generator[Tuple[int, Dict[str, Any]], None, None], 

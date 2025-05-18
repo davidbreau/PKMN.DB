@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from .game import Game
 
 class PokemonLearnset(SQLModel, table=True):
-    __tablename__ = "pokemons_learnsets"
+    __tablename__ = "pokemon_learnsets"
     
     # COLUMNS
     id: int | None = Field(default=None, primary_key=True)
