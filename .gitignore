@@ -182,3 +182,4 @@ uv.lock
 # Qodo
 .qodo
 
+app/db/PKMN.db
