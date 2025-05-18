@@ -292,10 +292,31 @@ class PokemonImporter:
         type_2_id = next((t.get("type", {}).get("url", "").rstrip("/").split("/")[-1] 
                          for t in types if t.get("slot") == 2), None)
         
+        # Determine the correct national Pokedex number
+        # For special forms (ID > 10000), get the number from species data instead of using the ID
+        species_id = self._extract_id_from_url(pokemon_data.get("species", {}).get("url", ""))
+        
+        # Get the national Pokedex number directly from the pokedex_numbers field in species_data
+        # This is the most accurate source for this information
+        national_pokedex_number = None
+        
+        if species_data and "pokedex_numbers" in species_data:
+            # Find the entry for the national Pokedex
+            for entry in species_data.get("pokedex_numbers", []):
+                if entry.get("pokedex", {}).get("name") == "national":
+                    national_pokedex_number = entry.get("entry_number")
+                    break
+        
+        # If we couldn't find the number in pokedex_numbers, fall back to species_id or pokemon_id
+        if not national_pokedex_number:
+            national_pokedex_number = species_id if pokemon_id > 10000 and species_id else pokemon_id
+        
+        logger.info(f"Using national Pokedex number {national_pokedex_number} for Pokemon ID {pokemon_id}")
+        
         # Create Pokemon object
         pokemon = Pokemon(
             id=pokemon_id,
-            national_pokedex_number=pokemon_id,
+            national_pokedex_number=national_pokedex_number,
             name_en=name_en,
             name_fr=name_fr,
             type_1_id=int(type_1_id) if type_1_id else None,
