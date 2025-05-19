@@ -1,5 +1,6 @@
 import scrapy
 import re
+import time
 from ..items import PokemonItem
 
 
@@ -10,7 +11,7 @@ class PokemonsSpider(scrapy.Spider):
     
     # Paramètre de limite pour les tests
     # Mettre à None pour désactiver la limite
-    LIMIT = 5  # Limiter à 5 Pokémon pour les tests
+    LIMIT = None  # No limit on number of Pokemon to scrape
     
     # Configuration spécifique pour cette araignée
     custom_settings = {
@@ -78,11 +79,8 @@ class PokemonsSpider(scrapy.Spider):
         
         # Extract Pokemon name
         name = response.css('h1.Card_cardTitle__URr_A::text').get()
-        if not name:
-            self.logger.warning(f"Could not find Pokemon name in {response.url}. Skipping.")
-            return
-            
-        pokemon['name'] = name.strip()
+        if name:
+            pokemon['name'] = name.strip()
         
         # Extract Pokedex number from URL (optional)
         url_match = re.search(r'/pokemon/(\d+)', response.url)
@@ -145,4 +143,5 @@ class PokemonsSpider(scrapy.Spider):
         
         self.logger.info(f"Scraped Pokémon {self.pokemon_count}/{self.LIMIT if self.LIMIT is not None else '∞'}: {pokemon.get('name')} (#{pokemon.get('pokedex_number')})")
         
+        time.sleep(0.2)  # Small delay between requests
         yield pokemon 

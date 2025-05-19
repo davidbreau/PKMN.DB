@@ -12,7 +12,6 @@ BOT_NAME = "PKMNdb"
 SPIDER_MODULES = ["PKMNdb.spiders"]
 NEWSPIDER_MODULE = "PKMNdb.spiders"
 
-
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 USER_AGENT = "PKMN.DB Bot (+https://github.com/davidbreau/PKMN.DB)"
 

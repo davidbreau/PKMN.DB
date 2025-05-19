@@ -1,6 +1,7 @@
 import scrapy
 import re
-from PKMNdb.items import MoveItem
+import time
+from ..items import MoveItem
 
 
 class MovesSpider(scrapy.Spider):
@@ -9,8 +10,8 @@ class MovesSpider(scrapy.Spider):
     
     # Starting with both fast and charged move lists
     start_urls = [
-        "https://db.pokemongohub.net/moves-list/category-fast",  # Fast moves
-        "https://db.pokemongohub.net/moves-list/category-charge"  # Charged moves
+        "https://db.pokemongohub.net/moves-list/pvp/category-fast",  # Fast moves
+        "https://db.pokemongohub.net/moves-list/pvp/category-charge"  # Charged moves
     ]
     
     # Mapping des types vers leurs IDs
@@ -37,7 +38,7 @@ class MovesSpider(scrapy.Spider):
     
     # Paramètre de limite pour les tests
     # Mettre à None pour désactiver la limite
-    LIMIT = 5  # Limiter à 5 attaques par catégorie pour les tests
+    LIMIT = None  # No limit on number of moves to scrape
     
     # Configuration spécifique pour cette araignée
     custom_settings = {
@@ -65,8 +66,8 @@ class MovesSpider(scrapy.Spider):
         # Determine move type based on URL
         move_category = "fast" if "category-fast" in response.url else "charged"
         
-        # Extract move links
-        move_links = response.css('a.MoveChip_moveChipContent__Oo_tS::attr(href)').getall()
+        # Extract move links - nouveau sélecteur pour les liens
+        move_links = response.css('.DataGrid_dataGrid__Q3gQi tbody tr td a::attr(href)').getall()
         
         # Remove duplicates
         move_links = list(set(move_links))
@@ -93,6 +94,11 @@ class MovesSpider(scrapy.Spider):
                 callback=self.parse_move,
                 cb_kwargs={"move_category": move_category}
             )
+        
+        # Gestion de la pagination
+        next_page = response.css('a[aria-label="Next page"]::attr(href)').get()
+        if next_page:
+            yield response.follow(next_page, callback=self.parse)
     
     def parse_move(self, response, move_category):
         """
@@ -175,4 +181,5 @@ class MovesSpider(scrapy.Spider):
             
         self.logger.info(f"Scraped Move {count_text}: {move.get('name')} ({move_category})")
         
+        time.sleep(0.2)  # Small delay between requests
         yield move 
