@@ -1,1 +1,0 @@
-scrapy-splash==0.9.0 
