@@ -13,11 +13,13 @@ from .pokemon_stat import PokemonStat
 from .type import Type
 from .type_effectiveness import TypeEffectiveness
 
-# Pokemon GO models
-from .GO_pokemon import GO_Pokemon
-from .GO_pokemon_stats import GO_PokemonStats
-from .GO_move import GO_Move
-from .GO_pokemon_learnset import GO_PokemonLearnset
+# Import Pokémon GO models
+from app.models.GO_tables.GO_pokemon import GO_Pokemon
+from app.models.GO_tables.GO_pokemon_stats import GO_PokemonStats
+from app.models.GO_tables.GO_move import GO_Move
+from app.models.GO_tables.GO_pokemon_learnset import GO_PokemonLearnset
+from app.models.GO_tables.GO_type import GO_Type
+from app.models.GO_tables.GO_type_effectiveness import GO_TypeEffectiveness
 
 __all_tables__ = [
     'Ability',
@@ -38,5 +40,7 @@ __all_tables__ = [
     'GO_Pokemon',
     'GO_PokemonStats',
     'GO_Move',
-    'GO_PokemonLearnset'
+    'GO_PokemonLearnset',
+    'GO_Type',
+    'GO_TypeEffectiveness'
 ] 

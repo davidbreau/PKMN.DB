@@ -183,6 +183,6 @@ uv.lock
 .qodo
 
 
-app/db/PKMN.db
-app/db/PKMNGO.db
-
+app/db/PKMN*.db
+app/db/PKMNGO*.db
+*.db
