@@ -9,12 +9,13 @@ class Engine:
         self.default_folder = Path(__file__).resolve().parent
     
     @contextmanager
-    def connect(self, db_name: str, folder: Path = None):
+    def connect(self, db_name: str, folder: Path = None, echo: bool = False):
         """Context manager pour se connecter à la base de données locale.
         
         Args:
             db_name: Nom du fichier de base de données
             folder: Dossier contenant la base (défaut: app/db)
+            echo: Afficher les logs SQL (défaut: False)
         """
         db_dir = folder or self.default_folder
         # Créer le répertoire parent si nécessaire
@@ -23,7 +24,7 @@ class Engine:
         db_path = db_dir / db_name
         engine = create_engine(
             f"sqlite:///{db_path}", 
-            echo=True, 
+            echo=echo, 
             connect_args={"check_same_thread": False}
         )
         session = Session(engine)
