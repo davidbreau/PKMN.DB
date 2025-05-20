@@ -1,4 +1,5 @@
 import scrapy
+from scrapy_splash import SplashRequest
 import re
 import time
 from ..items import PokemonItem
@@ -6,76 +7,78 @@ from ..items import PokemonItem
 
 class PokemonsSpider(scrapy.Spider):
     name = "pokemons"
-    allowed_domains = ["db.pokemongohub.net"]
-    start_urls = ["https://db.pokemongohub.net/tools/pokedex"]
-    
-    # Paramètre de limite pour les tests
-    # Mettre à None pour désactiver la limite
-    LIMIT = None  # No limit on number of Pokemon to scrape
+    allowed_domains = ["db.pokemongohub.net", "localhost"]
     
     # Configuration spécifique pour cette araignée
     custom_settings = {
         'ITEM_PIPELINES': {
             'PKMNdb.pipelines.CleanDataPipeline': 300,
             'PKMNdb.pipelines.PokemonDatabasePipeline': 900,
-        }
+        },
+        'SPLASH_URL': 'http://localhost:8050',
+        'DOWNLOADER_MIDDLEWARES': {
+            'scrapy_splash.SplashCookiesMiddleware': 723,
+            'scrapy_splash.SplashMiddleware': 725,
+            'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
+            'scrapy.downloadermiddlewares.retry.RetryMiddleware': 550,
+        },
+        'SPIDER_MIDDLEWARES': {
+            'scrapy_splash.SplashDeduplicateArgsMiddleware': 100,
+        },
+        'DUPEFILTER_CLASS': 'scrapy_splash.SplashAwareDupeFilter',
     }
-    
-    def __init__(self, limit=None, *args, **kwargs):
+
+    def __init__(self, max_id=2000, *args, **kwargs):
         super(PokemonsSpider, self).__init__(*args, **kwargs)
-        # La limite peut être passée par la ligne de commande
-        if limit is not None:
-            self.LIMIT = int(limit) if limit.lower() != 'none' else None
-        
-        # Compteur pour le suivi de la limite
+        # Valeur paramétrable en ligne de commande
+        self.MAX_POKEMON_ID = int(max_id) if max_id else 200
         self.pokemon_count = 0
-        self.logger.info(f"PokemonsSpider initialisé avec une limite de {self.LIMIT if self.LIMIT is not None else 'aucune limite'}")
+        
+    def start_requests(self):
+        """
+        Itère sur des IDs numériques croissants pour trouver les pokémons
+        """
+        base_url = "https://db.pokemongohub.net/pokemon/"
+        
+        self.logger.info(f"Trying pokemons with IDs from 1 to {self.MAX_POKEMON_ID}")
+        
+        # Générer des requêtes pour chaque ID possible de pokémon
+        for pokemon_id in range(1, self.MAX_POKEMON_ID + 1):
+            pokemon_url = f"{base_url}{pokemon_id}"
+            self.logger.info(f"Scheduling request for pokemon ID: {pokemon_id}")
+            yield SplashRequest(
+                pokemon_url,
+                self.parse_pokemon,
+                args={
+                    'wait': 2,
+                    'timeout': 90,
+                    'resource_timeout': 20,
+                },
+                # Retry policy for 404s
+                errback=self.handle_error,
+                meta={'pokemon_id': pokemon_id}
+            )
     
-    def parse(self, response):
+    def handle_error(self, failure):
         """
-        Start by parsing the regional pokedex page to get all pokedex lists
+        Gère les erreurs lors des requêtes, notamment les 404 (pokémon non trouvé)
         """
-        # Extract all regional pokedex links
-        pokedex_links = response.css('a[href^="/pokedex/"]:has(h2)::attr(href)').getall()
-        
-        # Remove duplicates
-        pokedex_links = list(set(pokedex_links))
-        
-        for pokedex_link in pokedex_links:
-            yield response.follow(pokedex_link, callback=self.parse_pokedex)
-    
-    def parse_pokedex(self, response):
-        """
-        Parse each pokedex page to get the list of Pokemon
-        """
-        # Extract all Pokemon links
-        pokemon_links = response.css('span.PokemonChip_pokemonChipContent__8xgo_').xpath('./parent::a/@href').getall()
-        
-        # Remove duplicates and filter out non-Pokemon pages
-        pokemon_links = [link for link in set(pokemon_links) if re.match(r'/pokemon/\d+$', link)]
-        
-        # Appliquer la limite si configurée
-        if self.LIMIT is not None:
-            remaining = max(0, self.LIMIT - self.pokemon_count)
-            if remaining == 0:
-                self.logger.info(f"Limite de {self.LIMIT} Pokémon atteinte. Arrêt du scraping.")
-                return
-            pokemon_links = pokemon_links[:remaining]
-        
-        for pokemon_link in pokemon_links:
-            self.pokemon_count += 1  # Incrémenter avant de scraper
-            yield response.follow(pokemon_link, callback=self.parse_pokemon)
-    
+        pokemon_id = failure.request.meta.get('pokemon_id')
+        self.logger.info(f"Pokemon ID {pokemon_id} not found (404 or other error)")
+
     def parse_pokemon(self, response):
         """
         Parse individual Pokemon page to extract all data
         """
+        # Vérifier si la page existe et contient un Pokémon
+        if response.css('h1.Card_cardTitle__URr_A::text').get() is None:
+            self.logger.info(f"Skipping ID {response.meta.get('pokemon_id')} - not a valid pokemon page")
+            return
+        
         pokemon = PokemonItem()
         
         # Extract Pokemon ID from the URL (for internal use)
-        pokemon_id_match = re.search(r'/pokemon/(\d+)', response.url)
-        if pokemon_id_match:
-            pokemon['id'] = pokemon_id_match.group(1)
+        pokemon['id'] = str(response.meta.get('pokemon_id'))
         
         # Extract Pokemon name
         name = response.css('h1.Card_cardTitle__URr_A::text').get()
@@ -83,31 +86,49 @@ class PokemonsSpider(scrapy.Spider):
             pokemon['name'] = name.strip()
         
         # Extract Pokedex number from URL (optional)
-        url_match = re.search(r'/pokemon/(\d+)', response.url)
-        if url_match:
-            pokemon['pokedex_number'] = url_match.group(1)
+        pokemon['pokedex_number'] = str(response.meta.get('pokemon_id'))
         
         # Extract basic stats (GO_PokemonStats)
         max_cp = response.css('tr:contains("Max CP") td strong::text').get()
         if max_cp:
-            pokemon['max_cp'] = max_cp.strip().replace('CP', '').strip()
+            try:
+                pokemon['max_cp'] = int(max_cp.strip().replace('CP', '').strip())
+            except (ValueError, TypeError):
+                self.logger.warning(f"Impossible de convertir max_cp en entier: {max_cp}")
             
         attack = response.css('tr:contains("Attack") td strong::text').get()
         if attack:
-            pokemon['attack'] = attack.strip().replace('ATK', '').strip()
+            try:
+                pokemon['attack'] = int(attack.strip().replace('ATK', '').strip())
+            except (ValueError, TypeError):
+                self.logger.warning(f"Impossible de convertir attack en entier: {attack}")
             
         defense = response.css('tr:contains("Defense") td strong::text').get()
         if defense:
-            pokemon['defense'] = defense.strip().replace('DEF', '').strip()
+            try:
+                pokemon['defense'] = int(defense.strip().replace('DEF', '').strip())
+            except (ValueError, TypeError):
+                self.logger.warning(f"Impossible de convertir defense en entier: {defense}")
             
         stamina = response.css('tr:contains("Stamina") td strong::text').get()
         if stamina:
-            pokemon['stamina'] = stamina.strip().replace('HP', '').strip()
+            try:
+                pokemon['stamina'] = int(stamina.strip().replace('HP', '').strip())
+            except (ValueError, TypeError):
+                self.logger.warning(f"Impossible de convertir stamina en entier: {stamina}")
         
         # Extract buddy distance
         buddy_distance = response.css('tr:contains("Buddy distance") td::text').get()
         if buddy_distance:
-            pokemon['buddy_distance'] = buddy_distance.strip()
+            try:
+                # Extraire le nombre et convertir en flottant
+                match = re.search(r'(\d+(\.\d+)?)\s*km', buddy_distance)
+                if match:
+                    pokemon['buddy_distance'] = float(match.group(1))
+                else:
+                    pokemon['buddy_distance'] = buddy_distance.strip()
+            except (ValueError, TypeError):
+                self.logger.warning(f"Impossible de convertir buddy_distance: {buddy_distance}")
         
         # Extract released status
         released = response.css('tr:contains("Released") td::text').get()
@@ -141,7 +162,12 @@ class PokemonsSpider(scrapy.Spider):
             })
         pokemon['charged_moves'] = charged_moves
         
-        self.logger.info(f"Scraped Pokémon {self.pokemon_count}/{self.LIMIT if self.LIMIT is not None else '∞'}: {pokemon.get('name')} (#{pokemon.get('pokedex_number')})")
+        self.pokemon_count += 1
+        self.logger.info(f"Scraped Pokemon {pokemon.get('name')} (ID: {pokemon.get('id')}) - Total: {self.pokemon_count}")
         
         time.sleep(0.2)  # Small delay between requests
-        yield pokemon 
+        yield pokemon
+        
+    def closed(self, reason):
+        """Appelé quand le spider se termine"""
+        self.logger.info(f"Spider closed. Stats: {self.pokemon_count} pokemons scraped.") 

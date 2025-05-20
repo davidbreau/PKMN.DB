@@ -26,19 +26,29 @@ class PokemonItem(scrapy.Item):
 
 
 class MoveItem(scrapy.Item):
-    # Move basic info
-    id = scrapy.Field()
+    # Basic info
+    id = scrapy.Field()  # Move ID from URL
     name = scrapy.Field()
-    type_id = scrapy.Field()  # Foreign key vers go_types.id
+    type = scrapy.Field()
+    tags = scrapy.Field()
+    
+    # Move type flags
+    is_pvp = scrapy.Field()
     is_fast = scrapy.Field()
     is_charged = scrapy.Field()
     
-    # Gym & Raid stats
-    damage = scrapy.Field()
-    energy = scrapy.Field()
-    duration = scrapy.Field()
+    # Raid/Gym stats
+    power = scrapy.Field()  # Base power/damage
+    energy = scrapy.Field()  # Energy cost/gain
+    animation_duration = scrapy.Field()  # In seconds
+    damage_window = scrapy.Field()  # Start-End in seconds
+    dps = scrapy.Field()  # Damage per second
+    dpe = scrapy.Field()  # Damage per energy
     
     # PVP stats
-    pvp_damage = scrapy.Field()
-    pvp_energy = scrapy.Field()
-    pvp_effects = scrapy.Field()
+    pvp_power = scrapy.Field()  # PVP power/damage
+    pvp_energy = scrapy.Field()  # PVP energy cost/gain
+    pvp_duration = scrapy.Field()  # In seconds for fast moves, in turns for charged moves
+    pvp_dps = scrapy.Field()  # PVP damage per second
+    pvp_dpe = scrapy.Field()  # PVP damage per energy
+    pvp_effects = scrapy.Field()  # Special effects in PVP

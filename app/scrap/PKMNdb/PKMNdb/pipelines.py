@@ -20,21 +20,17 @@ from app.models.GO_tables.GO_pokemon_stats import GO_PokemonStats
 from app.models.GO_tables.GO_move import GO_Move
 from app.models.GO_tables.GO_pokemon_learnset import GO_PokemonLearnset
 from app.db.engine import engine
+import sqlite3
 
 
 class CleanDataPipeline:
     def process_item(self, item, spider):
         adapter = ItemAdapter(item)
         
-        # Remove any trailing spaces from string fields
+        # Clean string fields
         for field in adapter.field_names():
-            value = adapter.get(field)
-            if isinstance(value, str):
-                adapter[field] = value.strip()
-            elif isinstance(value, list):
-                # Clean up strings in lists
-                if all(isinstance(x, str) for x in value):
-                    adapter[field] = [x.strip() for x in value]
+            if field in adapter and isinstance(adapter[field], str):
+                adapter[field] = adapter[field].strip()
         
         return item
 
@@ -201,77 +197,104 @@ class PokemonDatabasePipeline(BaseDatabasePipeline):
             raise
 
 
-class MoveDatabasePipeline(BaseDatabasePipeline):
-    """Pipeline spécifique pour les données de moves"""
+class MoveDatabasePipeline:
+    # Mapping des types vers leurs IDs
+    TYPE_ID_MAPPING = {
+        "Normal": 1,
+        "Fighting": 2,
+        "Flying": 3,
+        "Poison": 4,
+        "Ground": 5,
+        "Rock": 6,
+        "Bug": 7,
+        "Ghost": 8,
+        "Steel": 9,
+        "Fire": 10,
+        "Water": 11,
+        "Grass": 12,
+        "Electric": 13,
+        "Psychic": 14,
+        "Ice": 15,
+        "Dragon": 16,
+        "Dark": 17,
+        "Fairy": 18
+    }
+    
     def __init__(self):
-        super().__init__()
-        self.processed_moves = 0
+        self.moves_count = 0
+    
+    def open_spider(self, spider):
+        # Importer engine ici
+        from app.db.engine import engine
+        from app.models.GO_tables.GO_move import GO_Move
+        
+        spider.logger.info("Ouverture du pipeline de base de données pour les moves")
+    
+    def close_spider(self, spider):
+        spider.logger.info(f"Fermeture du pipeline de base de données. Moves traités: {self.moves_count}")
         
     def process_item(self, item, spider):
         if not isinstance(item, MoveItem):
             return item
             
-        self._process_move_item(item, spider)
-        return item
+        # Imports nécessaires
+        from app.db.engine import engine
+        from app.models.GO_tables.GO_move import GO_Move
+        from sqlmodel import select
         
-    def close_spider(self, spider):
-        spider.logger.info(f"Move pipeline - Processed: {self.processed_moves} Moves")
-        super().close_spider(spider)
-    
-    def _process_move_item(self, item, spider):
-        with self._get_session() as session:
-            try:
-                # Convert item to dict
-                item_dict = dict(item)
+        adapter = ItemAdapter(item)
+        
+        # Get type_id from type name
+        move_type = adapter.get('type')
+        type_id = self.TYPE_ID_MAPPING.get(move_type)
+        if type_id is None and move_type:
+            spider.logger.warning(f"Type inconnu trouvé: {move_type} pour {adapter.get('name')}")
+        
+        # Utiliser le context manager de Engine pour se connecter à la BDD
+        with engine.connect("PKMNGO.db") as session:
+            # Vérifier si le move existe déjà
+            existing_move = session.exec(
+                select(GO_Move).where(GO_Move.name == adapter.get('name'))
+            ).first()
+            
+            if existing_move:
+                # Update existing move
+                existing_move.type_id = type_id
+                existing_move.is_fast = adapter.get('is_fast')
+                existing_move.is_charged = adapter.get('is_charged')
                 
-                # Check if this move already exists
-                move_name = item_dict.get('name')
+                # Convert des stats numériques en string
+                existing_move.damage = str(adapter.get('power')) if adapter.get('power') is not None else None
+                existing_move.energy = str(adapter.get('energy')) if adapter.get('energy') is not None else None
+                existing_move.duration = str(adapter.get('animation_duration')) if adapter.get('animation_duration') is not None else None
                 
-                if not move_name:
-                    spider.logger.warning(f"Move has no name. Skipping.")
-                    return
+                existing_move.pvp_damage = str(adapter.get('pvp_power')) if adapter.get('pvp_power') is not None else None
+                existing_move.pvp_energy = str(adapter.get('pvp_energy')) if adapter.get('pvp_energy') is not None else None
+                existing_move.pvp_effects = adapter.get('pvp_effects')
                 
-                existing_move = session.query(GO_Move).filter(
-                    GO_Move.name == move_name
-                ).first()
-                
-                # Determine move type
-                is_fast = item_dict.get('is_fast')
-                is_charged = item_dict.get('is_charged')
-                
-                if existing_move:
-                    # Update existing record
-                    existing_move.type_id = item_dict.get('type_id', existing_move.type_id)
-                    existing_move.is_fast = is_fast
-                    existing_move.is_charged = is_charged
-                    existing_move.damage = item_dict.get('damage', existing_move.damage)
-                    existing_move.energy = item_dict.get('energy', existing_move.energy)
-                    existing_move.duration = item_dict.get('duration', existing_move.duration)
-                    existing_move.pvp_damage = item_dict.get('pvp_damage', existing_move.pvp_damage)
-                    existing_move.pvp_energy = item_dict.get('pvp_energy', existing_move.pvp_energy)
-                    existing_move.pvp_effects = item_dict.get('pvp_effects', existing_move.pvp_effects)
+                spider.logger.info(f"Updated move: {existing_move.name}")
+            else:
+                # Create new move
+                move = GO_Move(
+                    name=adapter.get('name'),
+                    type_id=type_id,
+                    is_fast=adapter.get('is_fast'),
+                    is_charged=adapter.get('is_charged'),
                     
-                    move = existing_move
-                    spider.logger.info(f"Updated Move: {move.name}")
-                else:
-                    # Create new Move
-                    move = GO_Move(
-                        name=move_name,
-                        type_id=item_dict.get('type_id'),
-                        is_fast=is_fast,
-                        is_charged=is_charged,
-                        damage=item_dict.get('damage'),
-                        energy=item_dict.get('energy'),
-                        duration=item_dict.get('duration'),
-                        pvp_damage=item_dict.get('pvp_damage'),
-                        pvp_energy=item_dict.get('pvp_energy'),
-                        pvp_effects=item_dict.get('pvp_effects')
-                    )
-                    session.add(move)
-                    spider.logger.info(f"Added new Move: {move.name}")
+                    # Convert des stats numériques en string
+                    damage=str(adapter.get('power')) if adapter.get('power') is not None else None,
+                    energy=str(adapter.get('energy')) if adapter.get('energy') is not None else None,
+                    duration=str(adapter.get('animation_duration')) if adapter.get('animation_duration') is not None else None,
+                    
+                    pvp_damage=str(adapter.get('pvp_power')) if adapter.get('pvp_power') is not None else None,
+                    pvp_energy=str(adapter.get('pvp_energy')) if adapter.get('pvp_energy') is not None else None,
+                    pvp_effects=adapter.get('pvp_effects'),
+                )
                 
-                self.processed_moves += 1
-                
-            except Exception as e:
-                spider.logger.error(f"Error processing Move item: {e}")
-                raise
+                session.add(move)
+                spider.logger.info(f"Added new move: {move.name}")
+            
+            # Le commit est automatique à la sortie du with grâce au context manager
+            self.moves_count += 1
+        
+        return item

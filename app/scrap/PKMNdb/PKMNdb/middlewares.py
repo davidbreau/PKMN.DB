@@ -4,6 +4,8 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from scrapy.http import HtmlResponse
+from scrapy_splash import SplashRequest
 
 # useful for handling different item types with a single interface
 from itemadapter import is_item, ItemAdapter
@@ -78,6 +80,15 @@ class PkmndbDownloaderMiddleware:
         # - or return a Request object
         # - or raise IgnoreRequest: process_exception() methods of
         #   installed downloader middleware will be called
+        if not isinstance(request, SplashRequest):
+            request.meta['splash'] = {
+                'args': {
+                    'wait': 2,  # Wait for JavaScript to execute
+                    'timeout': 90,
+                    'resource_timeout': 20,
+                },
+                'endpoint': 'render.html',
+            }
         return None
 
     def process_response(self, request, response, spider):
@@ -101,3 +112,52 @@ class PkmndbDownloaderMiddleware:
 
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
+
+
+class JavaScriptMiddleware:
+    @classmethod
+    def from_crawler(cls, crawler):
+        middleware = cls()
+        crawler.signals.connect(middleware.spider_opened, signal=signals.spider_opened)
+        return middleware
+
+    def spider_opened(self, spider):
+        spider.logger.info('Spider opened: %s' % spider.name)
+
+    def process_request(self, request, spider):
+        if not isinstance(request, SplashRequest):
+            # Configure default Splash parameters for all requests that aren't already SplashRequests
+            request.meta['splash'] = {
+                'args': {
+                    'wait': 3,  # Wait for JavaScript to execute (increased from 2)
+                    'timeout': 90,
+                    'resource_timeout': 20,
+                    'images': 0,  # Don't load images to speed up rendering
+                    'render_all': 1,  # Render the full page, including content outside the viewport
+                    'http_method': request.method,
+                    'js_enabled': True,  # Make sure JavaScript is enabled
+                },
+                'endpoint': 'render.html',
+            }
+            
+            # Add headers for better compatibility
+            if 'User-Agent' not in request.headers:
+                request.headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            
+        return None
+    
+    def process_response(self, request, response, spider):
+        # Handle response from Splash
+        if 'splash' in request.meta and hasattr(response, 'data'):
+            # Extract the HTML from the Splash response
+            if isinstance(response.data, dict) and 'html' in response.data:
+                # Create a new HtmlResponse with the HTML from Splash
+                return HtmlResponse(
+                    url=response.url,
+                    status=response.status,
+                    headers=response.headers,
+                    body=response.data['html'].encode('utf-8'),
+                    request=request,
+                    encoding='utf-8'
+                )
+        return response

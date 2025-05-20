@@ -5,8 +5,8 @@ import time
 from ..items import MoveItem
 
 
-class MovesSpider(scrapy.Spider):
-    name = "moves"
+class FastMovesSpider(scrapy.Spider):
+    name = "fast_moves"
     allowed_domains = ["db.pokemongohub.net", "localhost"]
     
     # Configuration spécifique pour cette araignée
@@ -28,23 +28,18 @@ class MovesSpider(scrapy.Spider):
         'DUPEFILTER_CLASS': 'scrapy_splash.SplashAwareDupeFilter',
     }
 
-    def __init__(self, max_id=1000, *args, **kwargs):
-        super(MovesSpider, self).__init__(*args, **kwargs)
-        # Valeur paramétrable en ligne de commande
-        self.MAX_MOVE_ID = int(max_id) if max_id else 300
-        self.fast_moves_count = 0
-        self.charged_moves_count = 0
-        
     def start_requests(self):
         """
         Itère sur des IDs numériques croissants pour trouver les moves
         """
+        # On commence à l'ID 1 et on essaie jusqu'à MAX_MOVE_ID
+        MAX_MOVE_ID = 300  # Valeur suffisamment grande pour couvrir tous les moves
         base_url = "https://db.pokemongohub.net/move/"
         
-        self.logger.info(f"Trying moves with IDs from 1 to {self.MAX_MOVE_ID}")
+        self.logger.info(f"Trying moves with IDs from 1 to {MAX_MOVE_ID}")
         
         # Générer des requêtes pour chaque ID possible de move
-        for move_id in range(1, self.MAX_MOVE_ID + 1):
+        for move_id in range(1, MAX_MOVE_ID + 1):
             move_url = f"{base_url}{move_id}"
             self.logger.info(f"Scheduling request for move ID: {move_id}")
             yield SplashRequest(
@@ -76,14 +71,10 @@ class MovesSpider(scrapy.Spider):
             self.logger.info(f"Skipping ID {response.meta.get('move_id')} - not a valid move page")
             return
         
-        # Déterminer le type de move (rapide ou chargé)
+        # Vérifier si c'est un move rapide (si non, on ignore)
         move_category = response.css('tr:contains("Category") td::text').get()
-        is_fast_move = move_category and "fast" in move_category.lower()
-        is_charged_move = move_category and ("charged" in move_category.lower() or "charge" in move_category.lower())
-        
-        # Ignorer si ce n'est ni un move rapide ni un move chargé
-        if not (is_fast_move or is_charged_move):
-            self.logger.info(f"Skipping ID {response.meta.get('move_id')} - unknown move category: {move_category}")
+        if move_category and "fast" not in move_category.lower():
+            self.logger.info(f"Skipping ID {response.meta.get('move_id')} - not a fast move")
             return
         
         move = MoveItem()
@@ -105,8 +96,8 @@ class MovesSpider(scrapy.Spider):
             move['type'] = move_type.strip()
         
         # Set move category
-        move['is_fast'] = is_fast_move
-        move['is_charged'] = is_charged_move
+        move['is_fast'] = True
+        move['is_charged'] = False
         
         # Extract Raid/Gym stats
         stats_section = response.css('section:contains("Gym and Raid Battles")')
@@ -178,22 +169,14 @@ class MovesSpider(scrapy.Spider):
             except (ValueError, TypeError):
                 self.logger.warning(f"Could not convert PVP energy to int: {pvp_energy}")
         
-        # PVP duration - Différent selon le type de move
+        # PVP duration
         pvp_duration = pvp_section.css('tr:contains("Duration") td::text').get()
         if pvp_duration:
+            # Pour les fast moves, la durée est en secondes
             try:
-                if is_fast_move:
-                    # Pour les fast moves, la durée est en secondes
-                    move['pvp_duration'] = float(pvp_duration.replace('s', '').strip())
-                else:
-                    # Pour les charged moves, la durée peut être en tours (Turns) ou en secondes
-                    if 'turn' in pvp_duration.lower() or 'turns' in pvp_duration.lower():
-                        move['pvp_duration'] = int(pvp_duration.split()[0])  # Get number before "Turns"
-                    else:
-                        # Si c'est en secondes
-                        move['pvp_duration'] = float(pvp_duration.replace('s', '').strip())
-            except (ValueError, TypeError, IndexError):
-                self.logger.warning(f"Could not convert PVP duration: {pvp_duration}")
+                move['pvp_duration'] = float(pvp_duration.replace('s', '').strip())
+            except (ValueError, TypeError):
+                self.logger.warning(f"Could not convert PVP duration to float: {pvp_duration}")
         
         # PVP DPS
         pvp_dps = pvp_section.css('tr:contains("DPS") td::text').get()
@@ -216,28 +199,12 @@ class MovesSpider(scrapy.Spider):
         if tags:
             move['tags'] = [tag.strip() for tag in tags.split(',')]
         
-        # For charged moves, extract PVP effects if any
-        if is_charged_move:
-            pvp_effects = pvp_section.xpath('./following-sibling::section[1]/header[contains(text(), "Effects")]/following-sibling::text()').get()
-            if pvp_effects and "no special effects" not in pvp_effects.lower():
-                move['pvp_effects'] = pvp_effects.strip()
-        
         # Extract Pokémon that can learn this move
         pokemon_with_move = response.css('ul.MoveInfo_pokemonList__ZJB1N li a::text').getall()
         if pokemon_with_move:
             move['pokemon_with_move'] = [p.strip() for p in pokemon_with_move]
         
-        # Incrémenter le compteur approprié
-        if is_fast_move:
-            self.fast_moves_count += 1
-            self.logger.info(f"Scraped Fast Move: {move.get('name')} (ID: {move.get('id')}) - Total: {self.fast_moves_count}")
-        else:
-            self.charged_moves_count += 1
-            self.logger.info(f"Scraped Charged Move: {move.get('name')} (ID: {move.get('id')}) - Total: {self.charged_moves_count}")
+        self.logger.info(f"Scraped Fast Move: {move.get('name')} (ID: {move.get('id')})")
         
         time.sleep(0.2)  # Small delay between requests
-        yield move
-        
-    def closed(self, reason):
-        """Appelée quand le spider se termine"""
-        self.logger.info(f"Spider closed. Stats: {self.fast_moves_count} fast moves, {self.charged_moves_count} charged moves scraped.") 
+        yield move 
