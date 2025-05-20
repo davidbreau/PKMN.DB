@@ -243,7 +243,7 @@ class MoveDatabasePipeline:
         from sqlmodel import select
         
         adapter = ItemAdapter(item)
-        
+                
         # Get type_id from type name
         move_type = adapter.get('type')
         type_id = self.TYPE_ID_MAPPING.get(move_type)
@@ -256,8 +256,8 @@ class MoveDatabasePipeline:
             existing_move = session.exec(
                 select(GO_Move).where(GO_Move.name == adapter.get('name'))
             ).first()
-            
-            if existing_move:
+                
+                if existing_move:
                 # Update existing move
                 existing_move.type_id = type_id
                 existing_move.is_fast = adapter.get('is_fast')
@@ -271,11 +271,11 @@ class MoveDatabasePipeline:
                 existing_move.pvp_damage = str(adapter.get('pvp_power')) if adapter.get('pvp_power') is not None else None
                 existing_move.pvp_energy = str(adapter.get('pvp_energy')) if adapter.get('pvp_energy') is not None else None
                 existing_move.pvp_effects = adapter.get('pvp_effects')
-                
+                    
                 spider.logger.info(f"Updated move: {existing_move.name}")
-            else:
+                else:
                 # Create new move
-                move = GO_Move(
+                    move = GO_Move(
                     name=adapter.get('name'),
                     type_id=type_id,
                     is_fast=adapter.get('is_fast'),
@@ -289,9 +289,9 @@ class MoveDatabasePipeline:
                     pvp_damage=str(adapter.get('pvp_power')) if adapter.get('pvp_power') is not None else None,
                     pvp_energy=str(adapter.get('pvp_energy')) if adapter.get('pvp_energy') is not None else None,
                     pvp_effects=adapter.get('pvp_effects'),
-                )
+                    )
                 
-                session.add(move)
+                    session.add(move)
                 spider.logger.info(f"Added new move: {move.name}")
             
             # Le commit est automatique à la sortie du with grâce au context manager

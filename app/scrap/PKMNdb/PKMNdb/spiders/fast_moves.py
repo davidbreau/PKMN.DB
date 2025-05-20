@@ -61,7 +61,7 @@ class FastMovesSpider(scrapy.Spider):
         """
         move_id = failure.request.meta.get('move_id')
         self.logger.info(f"Move ID {move_id} not found (404 or other error)")
-
+    
     def parse_move(self, response):
         """
         Parse individual move page to extract all data

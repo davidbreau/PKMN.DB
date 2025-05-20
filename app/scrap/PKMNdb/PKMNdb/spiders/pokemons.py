@@ -65,7 +65,7 @@ class PokemonsSpider(scrapy.Spider):
         """
         pokemon_id = failure.request.meta.get('pokemon_id')
         self.logger.info(f"Pokemon ID {pokemon_id} not found (404 or other error)")
-
+    
     def parse_pokemon(self, response):
         """
         Parse individual Pokemon page to extract all data
@@ -126,7 +126,7 @@ class PokemonsSpider(scrapy.Spider):
                 if match:
                     pokemon['buddy_distance'] = float(match.group(1))
                 else:
-                    pokemon['buddy_distance'] = buddy_distance.strip()
+            pokemon['buddy_distance'] = buddy_distance.strip()
             except (ValueError, TypeError):
                 self.logger.warning(f"Impossible de convertir buddy_distance: {buddy_distance}")
         
@@ -166,7 +166,7 @@ class PokemonsSpider(scrapy.Spider):
         self.logger.info(f"Scraped Pokemon {pokemon.get('name')} (ID: {pokemon.get('id')}) - Total: {self.pokemon_count}")
         
         time.sleep(0.2)  # Small delay between requests
-        yield pokemon
+        yield pokemon 
         
     def closed(self, reason):
         """Appelé quand le spider se termine"""
