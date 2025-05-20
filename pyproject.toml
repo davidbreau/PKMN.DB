@@ -13,6 +13,7 @@ dependencies = [
     "ujson>=5.10.0",
     "typer>=0.9.0",
     "roman>=5.0",
+    "scrapy-splash>=0.11.1",
 ]
 
 [dependency-groups]
@@ -31,4 +32,4 @@ build-backend = "hatchling.build"
 packages = ["app"]
 
 [project.scripts]
-pkmn-db = "app.db.cli:app"
+pkmn-db = "app.db.cli:main"
