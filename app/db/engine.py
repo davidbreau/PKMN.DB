@@ -5,7 +5,8 @@ from contextlib import contextmanager
 
 class Engine:
     def __init__(self):
-        self.default_folder = Path('app/db')
+        # Chemin absolu vers le dossier db, peu importe d'où est lancé le script
+        self.default_folder = Path(__file__).resolve().parent
     
     @contextmanager
     def connect(self, db_name: str, folder: Path = None):
@@ -16,8 +17,12 @@ class Engine:
             folder: Dossier contenant la base (défaut: app/db)
         """
         db_dir = folder or self.default_folder
+        # Créer le répertoire parent si nécessaire
+        db_dir.mkdir(parents=True, exist_ok=True)
+        
+        db_path = db_dir / db_name
         engine = create_engine(
-            f"sqlite:///{db_dir / db_name}", 
+            f"sqlite:///{db_path}", 
             echo=True, 
             connect_args={"check_same_thread": False}
         )
