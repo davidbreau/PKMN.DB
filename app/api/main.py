@@ -9,7 +9,6 @@ from litestar import Litestar, get
 from litestar.config.cors import CORSConfig
 from litestar.response import Response
 from litestar.openapi import OpenAPIConfig
-from litestar.static_files import StaticFilesConfig
 
 from app.api.routes.pokemon import (
     get_pokemon_list,
@@ -31,7 +30,7 @@ cors_config = CORSConfig(
     allow_headers=["*"],
 )
 
-# Configuration OpenAPI
+# Configuration OpenAPI simplifiée
 openapi_config = OpenAPIConfig(
     title="PKMN.DB API",
     version="1.0.0",
