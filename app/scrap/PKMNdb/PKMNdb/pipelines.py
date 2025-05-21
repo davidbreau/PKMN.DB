@@ -293,8 +293,8 @@ class MoveDatabasePipeline:
                 
                     session.add(move)
                 spider.logger.info(f"Added new move: {move.name}")
-            
+                
             # Le commit est automatique à la sortie du with grâce au context manager
             self.moves_count += 1
-        
+                
         return item
