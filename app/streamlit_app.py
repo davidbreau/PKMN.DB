@@ -24,10 +24,15 @@ st.markdown(
         .pokemon-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 32px;
-            margin-top: 32px;
+            gap: 8px 24px;
+            margin-top: 8px;
             padding: 0 24px;
-            margin-bottom: 32px;
+            margin-bottom: 0;
+        }
+        
+        /* Réduire l'espace entre les lignes de la grille */
+        .pokemon-grid + .pokemon-grid {
+            margin-top: 8px;
         }
         
         /* Style de la carte Pokémon */
@@ -44,7 +49,7 @@ st.markdown(
             margin: 0 auto;
             max-width: 200px;
             position: relative;
-            padding-bottom: 40px !important;
+            padding-bottom: 30px !important;
         }
 
         .pokemon-card:hover {
@@ -53,12 +58,12 @@ st.markdown(
 
         /* Style de la carte sélectionnée */
         .selected-pokemon {
-            box-shadow: 0 4px 12px rgba(255,139,61,0.2) !important;
-            border: 1px solid rgba(255,139,61,0.3) !important;
+            box-shadow: 0 2px 8px rgba(255,95,32,0.4) !important;
+            border: 2px solid rgba(255,95,32,0.5) !important;
         }
 
         .selected-pokemon:hover {
-            box-shadow: 0 6px 16px rgba(255,139,61,0.25) !important;
+            box-shadow: 0 3px 12px rgba(255,95,32,0.5) !important;
         }
 
         /* Style des éléments de la carte */
@@ -193,6 +198,24 @@ st.markdown(
         .type-dragon { background-color: #7038F8; }
         .type-steel { background-color: #B8B8D0; }
         .type-fairy { background-color: #F0B6BC; }
+
+        /* Supprimer les marges par défaut de Streamlit */
+        .stMarkdown {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        .row-widget {
+            margin-bottom: 0 !important;
+        }
+        /* Réduire l'espace des colonnes Streamlit */
+        .css-ocqkz7.e1tzin5v4,
+        .css-1r6slb0.e1tzin5v2 {
+            gap: 0 !important;
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -299,6 +322,10 @@ if pokemons:
                         st.session_state['selected_pokemon_id'] = None
                         st.session_state['selected_row'] = None
                     else:
+                        # Always clear previous selection before setting new one
+                        st.session_state['selected_pokemon_id'] = None
+                        st.session_state['selected_row'] = None
+                        # Then set the new selection
                         st.session_state['selected_pokemon_id'] = pokemon_id
                         st.session_state['selected_row'] = row_idx
                     st.rerun()
@@ -329,97 +356,104 @@ if pokemons:
                     type2 = supabase.table("types").select("name").eq("id", pokemon["type_2_id"]).single().execute().data
                     type_html += f' <span class="type-badge type-{type2["name"].lower()}">{type2["name"]}</span>'
                 
-                st.markdown(f"""
-                    <div style="text-align: center; margin: 20px 0;">
-                        <h2 style="color: #333; margin-bottom: 15px;">
-                            {pokemon['name_en']} / {pokemon['name_fr'] or '???'}
-                        </h2>
-                        <div style="margin: 10px 0;">
-                            {type_html}
+                st.markdown("""<div style="margin-top: -8px;"></div>""", unsafe_allow_html=True)
+                
+                # Trois colonnes pour les détails
+                col_info, col_stats, col_go = st.columns([1,1,1])
+                
+                # Colonne d'informations de base
+                with col_info:
+                    st.markdown(f"""
+                        <div style="text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%; padding: 8px;">
+                            <h2 style="color: #333; margin-bottom: 2px; font-size: 1.6em;">
+                                {pokemon['name_en']}
+                            </h2>
+                            <div style="color: #666; font-size: 1em; margin: 4px 0;">
+                                {pokemon['name_fr'] or '???'}
+                            </div>
+                            <div style="margin: 8px 0;">
+                                {type_html}
+                            </div>
                         </div>
-                    </div>
-                """, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
                 
-                # Stats dans une grille 2 colonnes
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    # Stats de base
+                # Colonne des stats de base
+                with col_stats:
                     stats = supabase.table("pokemon_stats").select("*").eq("pokemon_id", pokemon_id).single().execute()
                     if stats.data:
                         st.markdown("""
-                            <h3 style="color: #444; margin: 10px 0;">Base Stats</h3>
+                            <h3 style="color: #444; margin: 2px 0; font-size: 1.1em;">Base Stats</h3>
                         """, unsafe_allow_html=True)
                         
                         stats_data = [
-                            ("HP", stats.data['hp'], "#FF0000"),
-                            ("Attack", stats.data['attack'], "#F08030"),
-                            ("Defense", stats.data['defense'], "#F8D030"),
-                            ("Sp. Attack", stats.data['special_attack'], "#6890F0"),
-                            ("Sp. Defense", stats.data['special_defense'], "#78C850"),
-                            ("Speed", stats.data['speed'], "#F85888")
+                            ("HP", stats.data['hp'], "#FF5F20"),
+                            ("Attack", stats.data['attack'], "#FF5F20"),
+                            ("Defense", stats.data['defense'], "#FF5F20"),
+                            ("Sp. Attack", stats.data['special_attack'], "#FF5F20"),
+                            ("Sp. Defense", stats.data['special_defense'], "#FF5F20"),
+                            ("Speed", stats.data['speed'], "#FF5F20")
                         ]
                         
                         for name, value, color in stats_data:
                             percentage = (value / 255) * 100
                             st.markdown(f"""
-                                <div style="margin: 8px 0;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                        <span style="color: #555;">{name}</span>
-                                        <span style="color: #333; font-weight: 500;">{value}</span>
+                                <div style="margin: 2px 0;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 1px;">
+                                        <span style="color: #555; font-size: 0.9em;">{name}</span>
+                                        <span style="color: #333; font-weight: 500; font-size: 0.9em;">{value}</span>
                                     </div>
-                                    <div style="background: #e9ecef; height: 8px; border-radius: 4px;">
-                                        <div style="width: {percentage}%; background: {color}; height: 100%; border-radius: 4px;"></div>
+                                    <div style="background: #e9ecef; height: 6px; border-radius: 3px;">
+                                        <div style="width: {percentage}%; background: {color}; height: 100%; border-radius: 3px;"></div>
                                     </div>
                                 </div>
                             """, unsafe_allow_html=True)
                 
-                with col2:
-                    # GO stats
+                # Colonne des stats GO
+                with col_go:
                     try:
-                        go_pokemon = supabase.table("go_pokemons").select("*").eq("pokedex_number", pokemon["national_pokedex_number"]).single().execute()
-                        if go_pokemon.data:
-                            go_stats = supabase.table("go_pokemon_stats").select("*").eq("pokemon_id", go_pokemon.data["id"]).single().execute()
-                            if go_stats.data:
-                                st.markdown("""
-                                    <h3 style="color: #444; margin: 10px 0;">Pokémon GO Stats</h3>
-                                """, unsafe_allow_html=True)
-                                
-                                # Max CP séparé
+                        go_stats = supabase.table("go_pokemon_stats").select("*").eq("pokemon_id", pokemon_id).execute()
+                        if go_stats.data and len(go_stats.data) > 0:
+                            st.markdown("""
+                                <h3 style="color: #444; margin: 2px 0; font-size: 1.1em;">Pokémon GO Stats</h3>
+                            """, unsafe_allow_html=True)
+                            
+                            # Max CP séparé
+                            st.markdown(f"""
+                                <div style="text-align: center; margin: 4px 0;">
+                                    <span style="font-size: 1.1em; color: #333;">
+                                        Max CP: <strong>{go_stats.data[0]['max_cp']:,}</strong>
+                                    </span>
+                                </div>
+                            """, unsafe_allow_html=True)
+                            
+                            # Autres stats GO
+                            go_stats_data = [
+                                ("Attack", go_stats.data[0]['attack'], "#FF5F20"),
+                                ("Defense", go_stats.data[0]['defense'], "#FF5F20"),
+                                ("Stamina", go_stats.data[0]['stamina'], "#FF5F20")
+                            ]
+                            
+                            for name, value, color in go_stats_data:
+                                percentage = (value / 300) * 100
                                 st.markdown(f"""
-                                    <div style="text-align: center; margin: 15px 0;">
-                                        <span style="font-size: 1.2em; color: #333;">
-                                            Max CP: <strong>{go_stats.data['max_cp']:,}</strong>
-                                        </span>
+                                    <div style="margin: 2px 0;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 1px;">
+                                            <span style="color: #555; font-size: 0.9em;">{name}</span>
+                                            <span style="color: #333; font-weight: 500; font-size: 0.9em;">{value}</span>
+                                        </div>
+                                        <div style="background: #e9ecef; height: 6px; border-radius: 3px;">
+                                            <div style="width: {percentage}%; background: {color}; height: 100%; border-radius: 3px;"></div>
+                                        </div>
                                     </div>
                                 """, unsafe_allow_html=True)
-                                
-                                # Autres stats GO
-                                go_stats_data = [
-                                    ("Attack", go_stats.data['attack'], "#F08030"),
-                                    ("Defense", go_stats.data['defense'], "#F8D030"),
-                                    ("Stamina", go_stats.data['stamina'], "#78C850")
-                                ]
-                                
-                                for name, value, color in go_stats_data:
-                                    percentage = (value / 300) * 100
-                                    st.markdown(f"""
-                                        <div style="margin: 8px 0;">
-                                            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
-                                                <span style="color: #555;">{name}</span>
-                                                <span style="color: #333; font-weight: 500;">{value}</span>
-                                            </div>
-                                            <div style="background: #e9ecef; height: 8px; border-radius: 4px;">
-                                                <div style="width: {percentage}%; background: {color}; height: 100%; border-radius: 4px;"></div>
-                                            </div>
-                                        </div>
-                                    """, unsafe_allow_html=True)
                     except Exception as e:
                         st.markdown("""
-                            <p style="color: #666; font-style: italic; text-align: center; margin: 10px 0;">
+                            <p style="color: #666; font-style: italic; text-align: center; margin: 4px 0;">
                                 Pokémon GO stats not available
                             </p>
                         """, unsafe_allow_html=True)
+                
+                st.markdown("""<div style="margin-bottom: -8px;"></div>""", unsafe_allow_html=True)
             
             except Exception as e:
                 st.error(f"Error loading details: {str(e)}")
