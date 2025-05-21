@@ -1,0 +1,16 @@
+artifact_uri: file:///Users/davidjbreau/projects/PKMN.DB/ml/evolution_prediction/notebooks/mlruns/347477286032186581/1e79a56d96b4437ab97489954852d09a/artifacts
+deleted_time: 1747859285287
+end_time: 1747859038239
+entry_point_name: ''
+experiment_id: '347477286032186581'
+lifecycle_stage: deleted
+run_id: 1e79a56d96b4437ab97489954852d09a
+run_name: Random Forest
+run_uuid: 1e79a56d96b4437ab97489954852d09a
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747859018137
+status: 3
+tags: []
+user_id: davidjbreau

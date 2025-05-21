@@ -1,0 +1,10 @@
+digest: ed560169
+name: dataset
+profile: '{"features_shape": [38, 9], "features_size": 342, "features_nbytes": 2736,
+  "targets_shape": [38, 5], "targets_size": 190, "targets_nbytes": 1520}'
+schema: '{"mlflow_tensorspec": {"features": "[{\"type\": \"tensor\", \"tensor-spec\":
+  {\"dtype\": \"float64\", \"shape\": [-1, 9]}}]", "targets": "[{\"type\": \"tensor\",
+  \"tensor-spec\": {\"dtype\": \"float64\", \"shape\": [-1, 5]}}]"}}'
+source: '{"tags": {"mlflow.user": "davidjbreau", "mlflow.source.name": "/Users/davidjbreau/projects/PKMN.DB/.venv/lib/python3.12/site-packages/ipykernel_launcher.py",
+  "mlflow.source.type": "LOCAL"}}'
+source_type: code

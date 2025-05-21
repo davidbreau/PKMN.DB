@@ -1,0 +1,21 @@
+service: "api:app"
+description: "API de Prédiction d'Évolution Pokémon"
+labels:
+  owner: "pkmn.db"
+  project: "evolution-prediction"
+
+include:
+  - "*.py"
+  - "requirements.txt"
+  - "../models/*.joblib"
+  - "../models/*.json"
+
+python:
+  packages:
+    - fastapi==0.110.0
+    - uvicorn==0.29.0
+    - numpy==1.26.4
+    - scikit-learn==1.6.1
+    - joblib==1.3.2
+    - pydantic==2.7.1
+    - python-multipart==0.0.9 

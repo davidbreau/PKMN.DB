@@ -1,0 +1,16 @@
+artifact_uri: file:///Users/davidjbreau/projects/PKMN.DB/ml/evolution_prediction/notebooks/mlruns/347477286032186581/e68fd63b0a6f49b195c04aaf7a779769/artifacts
+deleted_time: 1747859659372
+end_time: 1747859484765
+entry_point_name: ''
+experiment_id: '347477286032186581'
+lifecycle_stage: deleted
+run_id: e68fd63b0a6f49b195c04aaf7a779769
+run_name: Decision Tree
+run_uuid: e68fd63b0a6f49b195c04aaf7a779769
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747859464909
+status: 3
+tags: []
+user_id: davidjbreau

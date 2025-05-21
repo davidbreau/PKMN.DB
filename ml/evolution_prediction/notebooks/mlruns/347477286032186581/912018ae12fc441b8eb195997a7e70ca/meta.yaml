@@ -1,0 +1,16 @@
+artifact_uri: file:///Users/davidjbreau/projects/PKMN.DB/ml/evolution_prediction/notebooks/mlruns/347477286032186581/912018ae12fc441b8eb195997a7e70ca/artifacts
+deleted_time: 1747858950929
+end_time: 1747857242258
+entry_point_name: ''
+experiment_id: '347477286032186581'
+lifecycle_stage: deleted
+run_id: 912018ae12fc441b8eb195997a7e70ca
+run_name: Gradient Boosting Chain
+run_uuid: 912018ae12fc441b8eb195997a7e70ca
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747857242223
+status: 4
+tags: []
+user_id: davidjbreau

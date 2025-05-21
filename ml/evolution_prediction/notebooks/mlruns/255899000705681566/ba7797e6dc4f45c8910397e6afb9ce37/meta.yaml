@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/davidjbreau/projects/PKMN.DB/ml/evolution_prediction/notebooks/mlruns/255899000705681566/ba7797e6dc4f45c8910397e6afb9ce37/artifacts
+end_time: 1747861746116
+entry_point_name: ''
+experiment_id: '255899000705681566'
+lifecycle_stage: active
+run_id: ba7797e6dc4f45c8910397e6afb9ce37
+run_name: masked-hen-301
+run_uuid: ba7797e6dc4f45c8910397e6afb9ce37
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747861659383
+status: 3
+tags: []
+user_id: davidjbreau

@@ -78,7 +78,7 @@ def get_mega_evolution_data():
     
     output_dir = Path("../data")
     output_dir.mkdir(parents=True, exist_ok=True)
-    df.write_csv(output_dir / "mega_evolutions.csv")
+    df.write_csv(output_dir / "bronzemega_evolutions.csv")
     
     return df
 

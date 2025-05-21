@@ -1,0 +1,1 @@
+{"input_cols": ["base_hp", "base_attack", "base_defense", "base_sp_attack", "base_sp_defense", "base_speed", "base_height", "base_weight", "base_experience"], "target_cols": ["evolved_attack", "evolved_defense", "evolved_sp_attack", "evolved_sp_defense", "evolved_speed"]}

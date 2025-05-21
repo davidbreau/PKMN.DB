@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/davidjbreau/projects/PKMN.DB/ml/evolution_prediction/notebooks/mlruns/255899000705681566/7b72bb0d5b5449ccba957317e07e3a90/artifacts
+end_time: 1747860868145
+entry_point_name: ''
+experiment_id: '255899000705681566'
+lifecycle_stage: active
+run_id: 7b72bb0d5b5449ccba957317e07e3a90
+run_name: tasteful-frog-739
+run_uuid: 7b72bb0d5b5449ccba957317e07e3a90
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747860792837
+status: 3
+tags: []
+user_id: davidjbreau

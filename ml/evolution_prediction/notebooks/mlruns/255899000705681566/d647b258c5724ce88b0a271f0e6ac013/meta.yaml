@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/davidjbreau/projects/PKMN.DB/ml/evolution_prediction/notebooks/mlruns/255899000705681566/d647b258c5724ce88b0a271f0e6ac013/artifacts
+end_time: 1747860868145
+entry_point_name: ''
+experiment_id: '255899000705681566'
+lifecycle_stage: active
+run_id: d647b258c5724ce88b0a271f0e6ac013
+run_name: gaudy-auk-182
+run_uuid: d647b258c5724ce88b0a271f0e6ac013
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747860792837
+status: 3
+tags: []
+user_id: davidjbreau

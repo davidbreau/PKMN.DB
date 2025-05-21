@@ -1,0 +1,2 @@
+RegressorChain(base_estimator=GradientBoostingRegressor(random_state=42),
+               order=[0, 1, 2, 3, 4], random_state=42)

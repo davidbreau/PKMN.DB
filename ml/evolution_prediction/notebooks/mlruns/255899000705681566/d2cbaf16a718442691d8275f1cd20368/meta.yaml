@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/davidjbreau/projects/PKMN.DB/ml/evolution_prediction/notebooks/mlruns/255899000705681566/d2cbaf16a718442691d8275f1cd20368/artifacts
+end_time: 1747861747303
+entry_point_name: ''
+experiment_id: '255899000705681566'
+lifecycle_stage: active
+run_id: d2cbaf16a718442691d8275f1cd20368
+run_name: Params_learning_rate=0.1_max_depth=5_n_estimators=200
+run_uuid: d2cbaf16a718442691d8275f1cd20368
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747861747226
+status: 3
+tags: []
+user_id: davidjbreau

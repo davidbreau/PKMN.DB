@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/davidjbreau/projects/PKMN.DB/ml/evolution_prediction/notebooks/mlruns/255899000705681566/8ce891a9a8e34c579bb047fd7f35d02e/artifacts
+end_time: 1747860868145
+entry_point_name: ''
+experiment_id: '255899000705681566'
+lifecycle_stage: active
+run_id: 8ce891a9a8e34c579bb047fd7f35d02e
+run_name: skillful-flea-362
+run_uuid: 8ce891a9a8e34c579bb047fd7f35d02e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1747860792837
+status: 3
+tags: []
+user_id: davidjbreau
