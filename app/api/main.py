@@ -9,6 +9,7 @@ from litestar import Litestar, get
 from litestar.config.cors import CORSConfig
 from litestar.response import Response
 from litestar.openapi import OpenAPIConfig
+from litestar.static_files import StaticFilesConfig
 
 from app.api.routes.pokemon import (
     get_pokemon_list,
