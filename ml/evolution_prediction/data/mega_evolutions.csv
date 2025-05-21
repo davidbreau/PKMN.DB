@@ -1,0 +1,49 @@
+base_pokemon_id,base_name,base_hp,base_attack,base_defense,base_sp_attack,base_sp_defense,base_speed,base_type_1,base_type_2,base_is_legendary,base_is_mythical,evolved_pokemon_id,evolved_name,evolved_type_1,evolved_type_2,evolved_hp,evolved_attack,evolved_defense,evolved_sp_attack,evolved_sp_defense,evolved_speed
+460,Abomasnow,90,92,75,92,85,60,grass,ice,0,0,10060,Mega Abomasnow,grass,ice,90,132,105,132,105,30
+359,Absol,65,130,60,75,60,75,dark,,0,0,10057,Mega Absol,dark,,65,150,60,115,60,115
+142,Aerodactyl,80,105,65,60,75,130,rock,flying,0,0,10042,Mega Aerodactyl,rock,flying,80,135,85,70,95,150
+306,Aggron,70,110,180,60,60,50,steel,rock,0,0,10053,Mega Aggron,steel,,70,140,230,60,80,50
+65,Alakazam,55,50,45,135,95,120,psychic,,0,0,10037,Mega Alakazam,psychic,,55,50,65,175,105,150
+334,Altaria,75,70,90,70,105,80,dragon,flying,0,0,10067,Mega Altaria,dragon,fairy,75,110,110,110,105,80
+181,Ampharos,90,75,85,115,90,55,electric,,0,0,10045,Mega Ampharos,electric,dragon,90,95,105,165,110,45
+531,Audino,103,60,86,60,86,50,normal,,0,0,10069,Mega Audino,normal,fairy,103,60,126,80,126,50
+354,Banette,64,115,65,83,63,65,ghost,,0,0,10056,Mega Banette,ghost,,64,165,75,93,83,75
+15,Beedrill,65,90,40,45,80,75,bug,poison,0,0,10090,Mega Beedrill,bug,poison,65,150,40,15,80,145
+9,Blastoise,79,83,100,85,105,78,water,,0,0,10036,Mega Blastoise,water,,79,103,120,135,115,78
+257,Blaziken,80,120,70,110,70,80,fire,fighting,0,0,10050,Mega Blaziken,fire,fighting,80,160,80,130,80,100
+323,Camerupt,70,100,70,105,75,40,fire,ground,0,0,10087,Mega Camerupt,fire,ground,70,120,100,145,105,20
+6,Charizard,78,84,78,109,85,100,fire,flying,0,0,10034,Mega Charizard X,fire,dragon,78,130,111,130,85,100
+6,Charizard,78,84,78,109,85,100,fire,flying,0,0,10035,Mega Charizard Y,fire,flying,78,104,78,159,115,100
+719,Diancie,50,100,150,100,150,50,rock,fairy,0,1,10075,Mega Diancie,rock,fairy,50,160,110,160,110,110
+475,Gallade,68,125,65,65,115,80,psychic,fighting,0,0,10068,Mega Gallade,psychic,fighting,68,165,95,65,115,110
+445,Garchomp,108,130,95,80,85,102,dragon,ground,0,0,10058,Mega Garchomp,dragon,ground,108,170,115,120,95,92
+282,Gardevoir,68,65,65,125,115,80,psychic,fairy,0,0,10051,Mega Gardevoir,psychic,fairy,68,85,65,165,135,100
+94,Gengar,60,65,60,130,75,110,ghost,poison,0,0,10038,Mega Gengar,ghost,poison,60,65,80,170,95,130
+362,Glalie,80,80,80,80,80,80,ice,,0,0,10074,Mega Glalie,ice,,80,120,80,120,80,100
+130,Gyarados,95,125,79,60,100,81,water,flying,0,0,10041,Mega Gyarados,water,dark,95,155,109,70,130,81
+214,Heracross,80,125,75,40,95,85,bug,fighting,0,0,10047,Mega Heracross,bug,fighting,80,185,115,40,105,75
+229,Houndoom,75,90,50,110,80,95,dark,fire,0,0,10048,Mega Houndoom,dark,fire,75,90,90,140,90,115
+115,Kangaskhan,105,95,80,40,80,90,normal,,0,0,10039,Mega Kangaskhan,normal,,105,125,100,60,100,100
+380,Latias,80,80,90,110,130,110,dragon,psychic,1,0,10062,Mega Latias,dragon,psychic,80,100,120,140,150,110
+381,Latios,80,90,80,130,110,110,dragon,psychic,1,0,10063,Mega Latios,dragon,psychic,80,130,100,160,120,110
+428,Lopunny,65,76,84,54,96,105,normal,,0,0,10088,Mega Lopunny,normal,fighting,65,136,94,54,96,135
+448,Lucario,70,110,70,115,70,90,fighting,steel,0,0,10059,Mega Lucario,fighting,steel,70,145,88,140,70,112
+310,Manectric,70,75,60,105,60,105,electric,,0,0,10055,Mega Manectric,electric,,70,75,80,135,80,135
+303,Mawile,50,85,85,55,55,50,steel,fairy,0,0,10052,Mega Mawile,steel,fairy,50,105,125,55,95,50
+308,Medicham,60,60,75,60,75,80,fighting,psychic,0,0,10054,Mega Medicham,fighting,psychic,60,100,85,80,85,100
+376,Metagross,80,135,130,95,90,70,steel,psychic,0,0,10076,Mega Metagross,steel,psychic,80,145,150,105,110,110
+150,Mewtwo,106,110,90,154,90,130,psychic,,1,0,10043,Mega Mewtwo X,psychic,fighting,106,190,100,154,100,130
+150,Mewtwo,106,110,90,154,90,130,psychic,,1,0,10044,Mega Mewtwo Y,psychic,,106,150,70,194,120,140
+18,Pidgeot,83,80,75,70,70,101,normal,flying,0,0,10073,Mega Pidgeot,normal,flying,83,80,80,135,80,121
+127,Pinsir,65,125,100,55,70,85,bug,,0,0,10040,Mega Pinsir,bug,flying,65,155,120,65,90,105
+384,Rayquaza,105,150,90,150,90,95,dragon,flying,1,0,10079,Mega Rayquaza,dragon,flying,105,180,100,180,100,115
+302,Sableye,50,75,75,65,65,50,dark,ghost,0,0,10066,Mega Sableye,dark,ghost,50,85,125,85,115,20
+373,Salamence,95,135,80,110,80,100,dragon,flying,0,0,10089,Mega Salamence,dragon,flying,95,145,130,120,90,120
+254,Sceptile,70,85,65,105,85,120,grass,,0,0,10065,Mega Sceptile,grass,dragon,70,110,75,145,85,145
+212,Scizor,70,130,100,55,80,65,bug,steel,0,0,10046,Mega Scizor,bug,steel,70,150,140,65,100,75
+319,Sharpedo,70,120,40,95,40,95,water,dark,0,0,10070,Mega Sharpedo,water,dark,70,140,70,110,65,105
+80,Slowbro,95,75,110,100,80,30,water,psychic,0,0,10071,Mega Slowbro,water,psychic,95,75,180,130,80,30
+208,Steelix,75,85,200,55,65,30,steel,ground,0,0,10072,Mega Steelix,steel,ground,75,125,230,55,95,30
+260,Swampert,100,110,90,85,90,60,water,ground,0,0,10064,Mega Swampert,water,ground,100,150,110,95,110,70
+248,Tyranitar,100,134,110,95,100,61,rock,dark,0,0,10049,Mega Tyranitar,rock,dark,100,164,150,95,120,71
+3,Venusaur,80,82,83,100,100,80,grass,poison,0,0,10033,Mega Venusaur,grass,poison,80,100,123,122,120,80
