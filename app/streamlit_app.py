@@ -1,11 +1,17 @@
 import streamlit as st
 from supabase import create_client, Client
 import math
+import requests
+import json
 
 # --- Connexion à Supabase ---
 url = st.secrets["supabase_url"]
 key = st.secrets["supabase_key"]
 supabase: Client = create_client(url, key)
+
+# --- Configuration de l'API BentoML ---
+BENTOML_API_URL = st.secrets["bento_cloud_api_end_point"]
+BENTOML_API_KEY = st.secrets["bento_cloud_api_key"]
 
 # --- CSS pour fond blanc et grille moderne ---
 st.markdown(
@@ -104,6 +110,25 @@ st.markdown(
             background: #ebebeb !important;
             color: #333 !important;
         }
+        
+        /* Style du bouton MEGA */
+        .mega-button > button {
+            background: linear-gradient(135deg, #4285f4, #34a853) !important;
+            color: white !important;
+            font-weight: bold !important;
+            border: none !important;
+            padding: 8px 16px !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
+            margin: 10px auto !important;
+            display: block !important;
+        }
+        
+        .mega-button > button:hover {
+            background: linear-gradient(135deg, #3b77db, #2d9348) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15) !important;
+        }
 
         /* Conteneur pour le bouton */
         .button-container {
@@ -178,6 +203,12 @@ st.markdown(
             font-size: 0.9em;
             float: right;
         }
+        
+        /* Style pour les stats augmentées */
+        .stat-increase {
+            color: #4285f4 !important;
+            font-weight: bold !important;
+        }
 
         /* Couleurs des types */
         .type-normal { background-color: #A8A878; }
@@ -233,6 +264,122 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# --- Fonction pour prédire l'évolution ---
+def predict_evolution(pokemon_data):
+    try:
+        # Debug: print the pokemon_data to see what fields are available
+        # st.write(f"Debug - Données disponibles: {pokemon_data.keys()}")
+        
+        headers = {
+            "Authorization": f"Bearer {BENTOML_API_KEY}",
+            "Content-Type": "application/json"
+        }
+        
+        # Create payload, ensuring all fields are present with fallbacks
+        payload = {
+            "pokemon_data": {
+                "base_hp": pokemon_data.get("hp", 0),
+                "base_attack": pokemon_data.get("attack", 0),
+                "base_defense": pokemon_data.get("defense", 0),
+                "base_sp_attack": pokemon_data.get("special_attack", 0),
+                "base_sp_defense": pokemon_data.get("special_defense", 0),
+                "base_speed": pokemon_data.get("speed", 0),
+                "base_height": pokemon_data.get("height_m", pokemon_data.get("height", 0)),
+                "base_weight": pokemon_data.get("weight_kg", pokemon_data.get("weight", 0)),
+                "base_experience": pokemon_data.get("base_experience", 0)
+            }
+        }
+        
+        # Debug: print the actual payload being sent
+        # st.write(f"Debug - Payload envoyé: {payload}")
+        
+        # Make sure the URL doesn't have a trailing slash
+        api_url = BENTOML_API_URL.rstrip('/')
+        # st.write(f"Debug - API URL: {api_url}/predict")
+        
+        response = requests.post(
+            f"{api_url}/predict",
+            headers=headers,
+            json=payload,
+            timeout=10  # Add timeout
+        )
+        
+        # Debug: print the response
+        # st.write(f"Debug - Status code: {response.status_code}")
+        
+        # Check if response has content and is valid JSON
+        response_text = response.text.strip()
+        if response.status_code == 200 and response_text:
+            try:
+                return response.json()
+            except json.JSONDecodeError as json_err:
+                # st.write(f"Debug - Response body: '{response_text}'")
+                st.error(f"Erreur de format JSON: {str(json_err)}")
+                
+                # Temporary solution: create mock data for demonstration
+                attack = pokemon_data.get("attack", 0)
+                defense = pokemon_data.get("defense", 0)
+                sp_attack = pokemon_data.get("special_attack", 0)
+                sp_defense = pokemon_data.get("special_defense", 0)
+                speed = pokemon_data.get("speed", 0)
+                
+                # Create a dummy response with approximately 20-30% stat increases
+                dummy_response = {
+                    "evolved_attack": round(attack * 1.25),
+                    "evolved_defense": round(defense * 1.2),
+                    "evolved_sp_attack": round(sp_attack * 1.3),
+                    "evolved_sp_defense": round(sp_defense * 1.25),
+                    "evolved_speed": round(speed * 1.15)
+                }
+                
+                st.warning("Utilisation de données de simulation pour la démonstration")
+                return dummy_response
+        else:
+            st.error(f"Erreur API: {response.status_code}")
+            if response_text:
+                # st.write(f"Debug - Response body: '{response_text}'")
+                pass
+                
+            # Temporary solution: create mock data for demonstration
+            attack = pokemon_data.get("attack", 0)
+            defense = pokemon_data.get("defense", 0)
+            sp_attack = pokemon_data.get("special_attack", 0)
+            sp_defense = pokemon_data.get("special_defense", 0)
+            speed = pokemon_data.get("speed", 0)
+            
+            # Create a dummy response with approximately 20-30% stat increases
+            dummy_response = {
+                "evolved_attack": round(attack * 1.25),
+                "evolved_defense": round(defense * 1.2),
+                "evolved_sp_attack": round(sp_attack * 1.3),
+                "evolved_sp_defense": round(sp_defense * 1.25),
+                "evolved_speed": round(speed * 1.15)
+            }
+            
+            st.warning("Utilisation de données de simulation pour la démonstration")
+            return dummy_response
+    except Exception as e:
+        st.error(f"Erreur de prédiction: {str(e)}")
+        
+        # Temporary solution: create mock data for demonstration
+        attack = pokemon_data.get("attack", 0)
+        defense = pokemon_data.get("defense", 0)
+        sp_attack = pokemon_data.get("special_attack", 0)
+        sp_defense = pokemon_data.get("special_defense", 0)
+        speed = pokemon_data.get("speed", 0)
+        
+        # Create a dummy response with approximately 20-30% stat increases
+        dummy_response = {
+            "evolved_attack": round(attack * 1.25),
+            "evolved_defense": round(defense * 1.2),
+            "evolved_sp_attack": round(sp_attack * 1.3),
+            "evolved_sp_defense": round(sp_defense * 1.25),
+            "evolved_speed": round(speed * 1.15)
+        }
+        
+        st.warning("Utilisation de données de simulation pour la démonstration")
+        return dummy_response
+
 # --- Barre de recherche ---
 st.markdown("""
 <h1 style='text-align: center; color: #222; font-size: 2.5em; font-weight: 800; margin-bottom: 0.2em;'>Pokédex PKMN.DB</h1>
@@ -252,6 +399,10 @@ if 'previous_search' not in st.session_state:
 if search != st.session_state['previous_search']:
     st.session_state['page'] = 1
     st.session_state['previous_search'] = search
+
+# État de la prédiction
+if 'evolution_prediction' not in st.session_state:
+    st.session_state['evolution_prediction'] = None
 
 # Calcul de l'offset
 page = st.session_state['page']
@@ -321,10 +472,12 @@ if pokemons:
                     if st.session_state.get('selected_pokemon_id') == pokemon_id:
                         st.session_state['selected_pokemon_id'] = None
                         st.session_state['selected_row'] = None
+                        st.session_state['evolution_prediction'] = None
                     else:
                         # Always clear previous selection before setting new one
                         st.session_state['selected_pokemon_id'] = None
                         st.session_state['selected_row'] = None
+                        st.session_state['evolution_prediction'] = None
                         # Then set the new selection
                         st.session_state['selected_pokemon_id'] = pokemon_id
                         st.session_state['selected_row'] = row_idx
@@ -340,21 +493,42 @@ if pokemons:
                 pokemon_id = st.session_state['selected_pokemon_id']
                 
                 # Basic info first
-                pokemon = supabase.table("pokemons").select("*").eq("id", pokemon_id).single().execute()
-                if not pokemon.data:
-                    st.error(f"Pokemon {pokemon_id} not found")
-                    st.session_state['selected_pokemon_id'] = None
-                    st.rerun()
+                try:
+                    pokemon = supabase.table("pokemons").select("*").eq("id", pokemon_id).single().execute()
+                    if not pokemon.data:
+                        st.error(f"Pokemon {pokemon_id} not found")
+                        st.session_state['selected_pokemon_id'] = None
+                        st.rerun()
+                    
+                    pokemon = pokemon.data
+                    
+                    # Get pokemon details for height, weight, etc.
+                    try:
+                        pokemon_details = supabase.table("pokemon_details").select("*").eq("pokemon_id", pokemon_id).single().execute()
+                        if pokemon_details.data:
+                            pokemon.update(pokemon_details.data)
+                    except Exception as e:
+                        # Ignorer l'erreur si les détails du Pokémon ne sont pas disponibles
+                        pass
                 
-                pokemon = pokemon.data
+                    # Titre et Types sur la même ligne
+                    try:
+                        type1 = supabase.table("types").select("name").eq("id", pokemon["type_1_id"]).single().execute().data
+                        type_html = f'<span class="type-badge type-{type1["name"].lower()}">{type1["name"]}</span>'
+                        
+                        if pokemon.get("type_2_id"):
+                            try:
+                                type2 = supabase.table("types").select("name").eq("id", pokemon["type_2_id"]).single().execute().data
+                                type_html += f' <span class="type-badge type-{type2["name"].lower()}">{type2["name"]}</span>'
+                            except Exception as e:
+                                # Ignorer l'erreur si le second type n'est pas disponible
+                                pass
+                    except Exception as e:
+                        # Si le type est introuvable, afficher une valeur par défaut
+                        type_html = '<span class="type-badge type-normal">Normal</span>'
                 
-                # Titre et Types sur la même ligne
-                type1 = supabase.table("types").select("name").eq("id", pokemon["type_1_id"]).single().execute().data
-                type_html = f'<span class="type-badge type-{type1["name"].lower()}">{type1["name"]}</span>'
-                
-                if pokemon.get("type_2_id"):
-                    type2 = supabase.table("types").select("name").eq("id", pokemon["type_2_id"]).single().execute().data
-                    type_html += f' <span class="type-badge type-{type2["name"].lower()}">{type2["name"]}</span>'
+                except Exception as e:
+                    st.error(f"Error loading details: {str(e)}")
                 
                 st.markdown("""<div style="margin-top: -8px;"></div>""", unsafe_allow_html=True)
                 
@@ -379,34 +553,121 @@ if pokemons:
                 
                 # Colonne des stats de base
                 with col_stats:
-                    stats = supabase.table("pokemon_stats").select("*").eq("pokemon_id", pokemon_id).single().execute()
-                    if stats.data:
+                    try:
+                        stats = supabase.table("pokemon_stats").select("*").eq("pokemon_id", pokemon_id).single().execute()
+                        if stats.data:
+                            # Entête des stats de base
+                            with st.container():
+                                st.markdown("""
+                                    <h3 style="color: #444; margin: 2px 0; font-size: 1.1em;">Base Stats</h3>
+                                """, unsafe_allow_html=True)
+                            
+                            # Vérifier s'il y a une prédiction pour afficher les stats augmentées
+                            prediction = st.session_state.get('evolution_prediction')
+                            
+                            stats_data = [
+                                ("HP", stats.data['hp'], "#FF5F20"),
+                                ("Attack", stats.data['attack'], "#FF5F20"),
+                                ("Defense", stats.data['defense'], "#FF5F20"),
+                                ("Sp. Attack", stats.data['special_attack'], "#FF5F20"),
+                                ("Sp. Defense", stats.data['special_defense'], "#FF5F20"),
+                                ("Speed", stats.data['speed'], "#FF5F20")
+                            ]
+                            
+                            for name, value, color in stats_data:
+                                percentage = (value / 255) * 100
+                                
+                                # Calculer l'augmentation si une prédiction existe
+                                increase_html = ""
+                                extended_bar_html = ""
+                                
+                                if prediction:
+                                    if name == "Attack" and "evolved_attack" in prediction:
+                                        new_value = prediction["evolved_attack"]
+                                        increase = new_value - value
+                                        increase_percentage = (increase / 255) * 100
+                                        increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
+                                        extended_bar_html = f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>'
+                                    elif name == "Defense" and "evolved_defense" in prediction:
+                                        new_value = prediction["evolved_defense"]
+                                        increase = new_value - value
+                                        increase_percentage = (increase / 255) * 100
+                                        increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
+                                        extended_bar_html = f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>'
+                                    elif name == "Sp. Attack" and "evolved_sp_attack" in prediction:
+                                        new_value = prediction["evolved_sp_attack"]
+                                        increase = new_value - value
+                                        increase_percentage = (increase / 255) * 100
+                                        increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
+                                        extended_bar_html = f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>'
+                                    elif name == "Sp. Defense" and "evolved_sp_defense" in prediction:
+                                        new_value = prediction["evolved_sp_defense"]
+                                        increase = new_value - value
+                                        increase_percentage = (increase / 255) * 100
+                                        increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
+                                        extended_bar_html = f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>'
+                                    elif name == "Speed" and "evolved_speed" in prediction:
+                                        new_value = prediction["evolved_speed"]
+                                        increase = new_value - value
+                                        increase_percentage = (increase / 255) * 100
+                                        increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
+                                        extended_bar_html = f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>'
+                                
+                                st.markdown(f"""
+                                    <div style="margin: 2px 0;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 1px;">
+                                            <span style="color: #555; font-size: 0.9em;">{name}</span>
+                                            <span style="color: #333; font-weight: 500; font-size: 0.9em;">{increase_html}{value}</span>
+                                        </div>
+                                        <div style="background: #e9ecef; height: 6px; border-radius: 3px; position: relative;">
+                                            <div style="width: {percentage}%; background: {color}; height: 100%; border-radius: 3px; position: absolute; top: 0; left: 0;"></div>
+                                            {extended_bar_html}
+                                        </div>
+                                    </div>
+                                """, unsafe_allow_html=True)
+                            
+                            # Bouton MEGA pour prédire l'évolution (maintenant placé APRÈS les stats)
+                            with st.container():
+                                st.markdown('<div style="height: 12px;"></div>', unsafe_allow_html=True)
+                                mega_col1, mega_col2, mega_col3 = st.columns([1,2,1])
+                                with mega_col2:
+                                    # Bouton PREDICT MEGA
+                                    if st.button("PREDICT MEGA", key=f"mega_{pokemon_id}", use_container_width=True, type="primary"):
+                                        with st.spinner("Prédiction en cours..."):
+                                            # Préparer les données pour l'API
+                                            stats_data = stats.data.copy()
+                                            stats_data.update(pokemon)
+                                            
+                                            # S'assurer que toutes les données obligatoires sont présentes
+                                            required_fields = ["hp", "attack", "defense", "special_attack", "special_defense", "speed"]
+                                            missing_fields = [field for field in required_fields if field not in stats_data or stats_data[field] is None]
+                                            
+                                            if missing_fields:
+                                                st.error(f"Données manquantes pour la prédiction: {', '.join(missing_fields)}")
+                                            else:
+                                                # Pour les champs optionnels, ajouter des valeurs par défaut
+                                                stats_data["height_m"] = stats_data.get("height_m", 0)
+                                                stats_data["weight_kg"] = stats_data.get("weight_kg", 0)
+                                                stats_data["base_experience"] = stats_data.get("base_experience", 0)
+                                                
+                                                # Appel à l'API de prédiction
+                                                prediction = predict_evolution(stats_data)
+                                                st.session_state['evolution_prediction'] = prediction
+                                                st.rerun()
+                            
+                            # Afficher un message explicatif si une prédiction existe
+                            if prediction:
+                                st.markdown("""
+                                    <div style="margin-top: 10px; font-size: 0.8em; color: #999; text-align: center;">
+                                        ⚡ Valeurs en bleu = augmentations prédites lors d'une méga-évolution
+                                    </div>
+                                """, unsafe_allow_html=True)
+                    except Exception as e:
                         st.markdown("""
-                            <h3 style="color: #444; margin: 2px 0; font-size: 1.1em;">Base Stats</h3>
+                            <div style="text-align: center; margin: 20px 0;">
+                                <p style="color: #666;">Statistiques indisponibles pour ce Pokémon</p>
+                            </div>
                         """, unsafe_allow_html=True)
-                        
-                        stats_data = [
-                            ("HP", stats.data['hp'], "#FF5F20"),
-                            ("Attack", stats.data['attack'], "#FF5F20"),
-                            ("Defense", stats.data['defense'], "#FF5F20"),
-                            ("Sp. Attack", stats.data['special_attack'], "#FF5F20"),
-                            ("Sp. Defense", stats.data['special_defense'], "#FF5F20"),
-                            ("Speed", stats.data['speed'], "#FF5F20")
-                        ]
-                        
-                        for name, value, color in stats_data:
-                            percentage = (value / 255) * 100
-                            st.markdown(f"""
-                                <div style="margin: 2px 0;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 1px;">
-                                        <span style="color: #555; font-size: 0.9em;">{name}</span>
-                                        <span style="color: #333; font-weight: 500; font-size: 0.9em;">{value}</span>
-                                    </div>
-                                    <div style="background: #e9ecef; height: 6px; border-radius: 3px;">
-                                        <div style="width: {percentage}%; background: {color}; height: 100%; border-radius: 3px;"></div>
-                                    </div>
-                                </div>
-                            """, unsafe_allow_html=True)
                 
                 # Colonne des stats GO
                 with col_go:
@@ -441,8 +702,8 @@ if pokemons:
                                             <span style="color: #555; font-size: 0.9em;">{name}</span>
                                             <span style="color: #333; font-weight: 500; font-size: 0.9em;">{value}</span>
                                         </div>
-                                        <div style="background: #e9ecef; height: 6px; border-radius: 3px;">
-                                            <div style="width: {percentage}%; background: {color}; height: 100%; border-radius: 3px;"></div>
+                                        <div style="background: #e9ecef; height: 6px; border-radius: 3px; position: relative;">
+                                            <div style="width: {percentage}%; background: {color}; height: 100%; border-radius: 3px; position: absolute; top: 0; left: 0;"></div>
                                         </div>
                                     </div>
                                 """, unsafe_allow_html=True)
@@ -498,3 +759,4 @@ if search != st.session_state['previous_search']:
     st.session_state['previous_search'] = search
     st.session_state['selected_pokemon_id'] = None  # Réinitialiser uniquement lors d'une nouvelle recherche
     st.session_state['selected_row'] = None 
+    st.session_state['evolution_prediction'] = None 
