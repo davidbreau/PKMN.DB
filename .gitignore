@@ -182,6 +182,8 @@ uv.lock
 # Qodo
 .qodo
 
+# Streamlit secrets
+.streamlit/secrets.toml
 
 app/db/PKMN*.db
 app/db/PKMNGO*.db

@@ -18,6 +18,7 @@ dependencies = [
     "matplotlib>=3.10.3",
     "uvicorn>=0.34.2",
     "litestar>=2.16.0",
+    "streamlit>=1.45.1",
 ]
 
 [dependency-groups]

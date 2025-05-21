@@ -65,4 +65,4 @@ class Database:
         return len(data)
 
 # Créer une instance de la base de données
-db = Database() 
+db = Database()    
