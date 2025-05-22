@@ -494,13 +494,13 @@ if pokemons:
                 
                 # Basic info first
                 try:
-                    pokemon = supabase.table("pokemons").select("*").eq("id", pokemon_id).single().execute()
-                    if not pokemon.data:
-                        st.error(f"Pokemon {pokemon_id} not found")
-                        st.session_state['selected_pokemon_id'] = None
-                        st.rerun()
-                    
-                    pokemon = pokemon.data
+                pokemon = supabase.table("pokemons").select("*").eq("id", pokemon_id).single().execute()
+                if not pokemon.data:
+                    st.error(f"Pokemon {pokemon_id} not found")
+                    st.session_state['selected_pokemon_id'] = None
+                    st.rerun()
+                
+                pokemon = pokemon.data
                     
                     # Get pokemon details for height, weight, etc.
                     try:
@@ -511,15 +511,15 @@ if pokemons:
                         # Ignorer l'erreur si les détails du Pokémon ne sont pas disponibles
                         pass
                 
-                    # Titre et Types sur la même ligne
+                # Titre et Types sur la même ligne
                     try:
-                        type1 = supabase.table("types").select("name").eq("id", pokemon["type_1_id"]).single().execute().data
-                        type_html = f'<span class="type-badge type-{type1["name"].lower()}">{type1["name"]}</span>'
-                        
-                        if pokemon.get("type_2_id"):
+                type1 = supabase.table("types").select("name").eq("id", pokemon["type_1_id"]).single().execute().data
+                type_html = f'<span class="type-badge type-{type1["name"].lower()}">{type1["name"]}</span>'
+                
+                if pokemon.get("type_2_id"):
                             try:
-                                type2 = supabase.table("types").select("name").eq("id", pokemon["type_2_id"]).single().execute().data
-                                type_html += f' <span class="type-badge type-{type2["name"].lower()}">{type2["name"]}</span>'
+                    type2 = supabase.table("types").select("name").eq("id", pokemon["type_2_id"]).single().execute().data
+                    type_html += f' <span class="type-badge type-{type2["name"].lower()}">{type2["name"]}</span>'
                             except Exception as e:
                                 # Ignorer l'erreur si le second type n'est pas disponible
                                 pass
@@ -554,74 +554,74 @@ if pokemons:
                 # Colonne des stats de base
                 with col_stats:
                     try:
-                        stats = supabase.table("pokemon_stats").select("*").eq("pokemon_id", pokemon_id).single().execute()
-                        if stats.data:
+                    stats = supabase.table("pokemon_stats").select("*").eq("pokemon_id", pokemon_id).single().execute()
+                    if stats.data:
                             # Entête des stats de base
                             with st.container():
-                                st.markdown("""
-                                    <h3 style="color: #444; margin: 2px 0; font-size: 1.1em;">Base Stats</h3>
-                                """, unsafe_allow_html=True)
-                            
+                        st.markdown("""
+                            <h3 style="color: #444; margin: 2px 0; font-size: 1.1em;">Base Stats</h3>
+                        """, unsafe_allow_html=True)
+                        
                             # Vérifier s'il y a une prédiction pour afficher les stats augmentées
                             prediction = st.session_state.get('evolution_prediction')
                             
-                            stats_data = [
-                                ("HP", stats.data['hp'], "#FF5F20"),
-                                ("Attack", stats.data['attack'], "#FF5F20"),
-                                ("Defense", stats.data['defense'], "#FF5F20"),
-                                ("Sp. Attack", stats.data['special_attack'], "#FF5F20"),
-                                ("Sp. Defense", stats.data['special_defense'], "#FF5F20"),
-                                ("Speed", stats.data['speed'], "#FF5F20")
-                            ]
-                            
-                            for name, value, color in stats_data:
-                                percentage = (value / 255) * 100
+                        stats_data = [
+                            ("HP", stats.data['hp'], "#FF5F20"),
+                            ("Attack", stats.data['attack'], "#FF5F20"),
+                            ("Defense", stats.data['defense'], "#FF5F20"),
+                            ("Sp. Attack", stats.data['special_attack'], "#FF5F20"),
+                            ("Sp. Defense", stats.data['special_defense'], "#FF5F20"),
+                            ("Speed", stats.data['speed'], "#FF5F20")
+                        ]
+                        
+                        for name, value, color in stats_data:
+                            percentage = (value / 255) * 100
                                 
                                 # Calculer l'augmentation si une prédiction existe
                                 increase_html = ""
-                                extended_bar_html = ""
+                                increase_percentage = 0
                                 
                                 if prediction:
-                                    if name == "Attack" and "evolved_attack" in prediction:
+                                    if name == "HP" and "evolved_hp" in prediction:
+                                        new_value = prediction["evolved_hp"]
+                                        increase = new_value - value
+                                        increase_percentage = (increase / 255) * 100
+                                        increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
+                                    elif name == "Attack" and "evolved_attack" in prediction:
                                         new_value = prediction["evolved_attack"]
                                         increase = new_value - value
                                         increase_percentage = (increase / 255) * 100
                                         increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
-                                        extended_bar_html = f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>'
                                     elif name == "Defense" and "evolved_defense" in prediction:
                                         new_value = prediction["evolved_defense"]
                                         increase = new_value - value
                                         increase_percentage = (increase / 255) * 100
                                         increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
-                                        extended_bar_html = f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>'
                                     elif name == "Sp. Attack" and "evolved_sp_attack" in prediction:
                                         new_value = prediction["evolved_sp_attack"]
                                         increase = new_value - value
                                         increase_percentage = (increase / 255) * 100
                                         increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
-                                        extended_bar_html = f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>'
                                     elif name == "Sp. Defense" and "evolved_sp_defense" in prediction:
                                         new_value = prediction["evolved_sp_defense"]
                                         increase = new_value - value
                                         increase_percentage = (increase / 255) * 100
                                         increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
-                                        extended_bar_html = f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>'
                                     elif name == "Speed" and "evolved_speed" in prediction:
                                         new_value = prediction["evolved_speed"]
                                         increase = new_value - value
                                         increase_percentage = (increase / 255) * 100
                                         increase_html = f'<span class="stat-increase">+{increase:.0f}</span> '
-                                        extended_bar_html = f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>'
                                 
-                                st.markdown(f"""
-                                    <div style="margin: 2px 0;">
-                                        <div style="display: flex; justify-content: space-between; margin-bottom: 1px;">
-                                            <span style="color: #555; font-size: 0.9em;">{name}</span>
+                            st.markdown(f"""
+                                <div style="margin: 2px 0;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 1px;">
+                                        <span style="color: #555; font-size: 0.9em;">{name}</span>
                                             <span style="color: #333; font-weight: 500; font-size: 0.9em;">{increase_html}{value}</span>
                                         </div>
-                                        <div style="background: #e9ecef; height: 6px; border-radius: 3px; position: relative;">
-                                            <div style="width: {percentage}%; background: {color}; height: 100%; border-radius: 3px; position: absolute; top: 0; left: 0;"></div>
-                                            {extended_bar_html}
+                                        <div style="background: #e9ecef; height: 6px; border-radius: 3px; position: relative; overflow: hidden;">
+                                            <div style="width: {percentage}%; height: 100%; background: {color}; border-radius: 3px;"></div>
+                                            {f'<div style="position: absolute; top: 0; left: {percentage}%; width: {increase_percentage}%; background: #4285f4; height: 100%; border-radius: 0 3px 3px 0;"></div>' if increase_percentage > 0 else ''}
                                         </div>
                                     </div>
                                 """, unsafe_allow_html=True)
@@ -632,7 +632,21 @@ if pokemons:
                                 mega_col1, mega_col2, mega_col3 = st.columns([1,2,1])
                                 with mega_col2:
                                     # Bouton PREDICT MEGA
-                                    if st.button("PREDICT MEGA", key=f"mega_{pokemon_id}", use_container_width=True, type="primary"):
+                                    button_style = """
+                                    <style>
+                                    div[data-testid="stButton"] button {
+                                        background-color: #4285f4 !important;
+                                        color: white !important;
+                                        font-weight: bold !important;
+                                        border: none !important;
+                                    }
+                                    div[data-testid="stButton"] button:hover {
+                                        background-color: #3b77db !important;
+                                    }
+                                    </style>
+                                    """
+                                    st.markdown(button_style, unsafe_allow_html=True)
+                                    if st.button("PREDICT MEGA", key=f"mega_{pokemon_id}", use_container_width=True):
                                         with st.spinner("Prédiction en cours..."):
                                             # Préparer les données pour l'API
                                             stats_data = stats.data.copy()
@@ -658,7 +672,7 @@ if pokemons:
                             # Afficher un message explicatif si une prédiction existe
                             if prediction:
                                 st.markdown("""
-                                    <div style="margin-top: 10px; font-size: 0.8em; color: #999; text-align: center;">
+                                    <div style="margin-top: 5px; font-size: 0.7em; color: #bbb; text-align: center;">
                                         ⚡ Valeurs en bleu = augmentations prédites lors d'une méga-évolution
                                     </div>
                                 """, unsafe_allow_html=True)
@@ -666,8 +680,8 @@ if pokemons:
                         st.markdown("""
                             <div style="text-align: center; margin: 20px 0;">
                                 <p style="color: #666;">Statistiques indisponibles pour ce Pokémon</p>
-                            </div>
-                        """, unsafe_allow_html=True)
+                                </div>
+                            """, unsafe_allow_html=True)
                 
                 # Colonne des stats GO
                 with col_go:
@@ -702,8 +716,8 @@ if pokemons:
                                             <span style="color: #555; font-size: 0.9em;">{name}</span>
                                             <span style="color: #333; font-weight: 500; font-size: 0.9em;">{value}</span>
                                         </div>
-                                        <div style="background: #e9ecef; height: 6px; border-radius: 3px; position: relative;">
-                                            <div style="width: {percentage}%; background: {color}; height: 100%; border-radius: 3px; position: absolute; top: 0; left: 0;"></div>
+                                        <div style="background: #e9ecef; height: 6px; border-radius: 3px; position: relative; overflow: hidden;">
+                                            <div style="width: {percentage}%; height: 100%; background: {color}; border-radius: 3px;"></div>
                                         </div>
                                     </div>
                                 """, unsafe_allow_html=True)
