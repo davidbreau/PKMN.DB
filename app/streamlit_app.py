@@ -510,7 +510,7 @@ if pokemons:
                     except Exception:
                         # Ignorer l'erreur si les détails du Pokémon ne sont pas disponibles
                         pass
-                
+                    
                     # Titre et Types sur la même ligne
                     try:
                         type1 = supabase.table("types").select("name").eq("id", pokemon["type_1_id"]).single().execute().data
@@ -526,7 +526,6 @@ if pokemons:
                     except Exception:
                         # Si le type est introuvable, afficher une valeur par défaut
                         type_html = '<span class="type-badge type-normal">Normal</span>'
-                
                 except Exception as e:
                     st.error(f"Error loading details: {str(e)}")
                 
@@ -625,57 +624,57 @@ if pokemons:
                                         </div>
                                     </div>
                                 """, unsafe_allow_html=True)
-                            
-                            # Bouton MEGA pour prédire l'évolution (maintenant placé APRÈS les stats)
-                            with st.container():
-                                st.markdown('<div style="height: 12px;"></div>', unsafe_allow_html=True)
-                                mega_col1, mega_col2, mega_col3 = st.columns([1,2,1])
-                                with mega_col2:
-                                    # Bouton PREDICT MEGA
-                                    button_style = """
-                                    <style>
-                                    div[data-testid="stButton"] button {
-                                        background-color: #4285f4 !important;
-                                        color: white !important;
-                                        font-weight: bold !important;
-                                        border: none !important;
-                                    }
-                                    div[data-testid="stButton"] button:hover {
-                                        background-color: #3b77db !important;
-                                    }
-                                    </style>
-                                    """
-                                    st.markdown(button_style, unsafe_allow_html=True)
-                                    if st.button("PREDICT MEGA", key=f"mega_{pokemon_id}", use_container_width=True):
-                                        with st.spinner("Prédiction en cours..."):
-                                            # Préparer les données pour l'API
-                                            stats_data = stats.data.copy()
-                                            stats_data.update(pokemon)
-                                            
-                                            # S'assurer que toutes les données obligatoires sont présentes
-                                            required_fields = ["hp", "attack", "defense", "special_attack", "special_defense", "speed"]
-                                            missing_fields = [field for field in required_fields if field not in stats_data or stats_data[field] is None]
-                                            
-                                            if missing_fields:
-                                                st.error(f"Données manquantes pour la prédiction: {', '.join(missing_fields)}")
-                                            else:
-                                                # Pour les champs optionnels, ajouter des valeurs par défaut
-                                                stats_data["height_m"] = stats_data.get("height_m", 0)
-                                                stats_data["weight_kg"] = stats_data.get("weight_kg", 0)
-                                                stats_data["base_experience"] = stats_data.get("base_experience", 0)
+                                
+                                # Bouton MEGA pour prédire l'évolution
+                                with st.container():
+                                    st.markdown('<div style="height: 12px;"></div>', unsafe_allow_html=True)
+                                    mega_col1, mega_col2, mega_col3 = st.columns([1,2,1])
+                                    with mega_col2:
+                                        # Bouton PREDICT MEGA
+                                        button_style = """
+                                        <style>
+                                        div[data-testid="stButton"] button {
+                                            background-color: #4285f4 !important;
+                                            color: white !important;
+                                            font-weight: bold !important;
+                                            border: none !important;
+                                        }
+                                        div[data-testid="stButton"] button:hover {
+                                            background-color: #3b77db !important;
+                                        }
+                                        </style>
+                                        """
+                                        st.markdown(button_style, unsafe_allow_html=True)
+                                        if st.button("PREDICT MEGA", key=f"mega_{pokemon_id}", use_container_width=True):
+                                            with st.spinner("Prédiction en cours..."):
+                                                # Préparer les données pour l'API
+                                                stats_data = stats.data.copy()
+                                                stats_data.update(pokemon)
                                                 
-                                                # Appel à l'API de prédiction
-                                                prediction = predict_evolution(stats_data)
-                                                st.session_state['evolution_prediction'] = prediction
-                                                st.rerun()
-                            
-                            # Afficher un message explicatif si une prédiction existe
-                            if prediction:
-                                st.markdown("""
-                                    <div style="margin-top: 5px; font-size: 0.7em; color: #bbb; text-align: center;">
-                                        ⚡ Valeurs en bleu = augmentations prédites lors d'une méga-évolution
-                                    </div>
-                                """, unsafe_allow_html=True)
+                                                # S'assurer que toutes les données obligatoires sont présentes
+                                                required_fields = ["hp", "attack", "defense", "special_attack", "special_defense", "speed"]
+                                                missing_fields = [field for field in required_fields if field not in stats_data or stats_data[field] is None]
+                                                
+                                                if missing_fields:
+                                                    st.error(f"Données manquantes pour la prédiction: {', '.join(missing_fields)}")
+                                                else:
+                                                    # Pour les champs optionnels, ajouter des valeurs par défaut
+                                                    stats_data["height_m"] = stats_data.get("height_m", 0)
+                                                    stats_data["weight_kg"] = stats_data.get("weight_kg", 0)
+                                                    stats_data["base_experience"] = stats_data.get("base_experience", 0)
+                                                    
+                                                    # Appel à l'API de prédiction
+                                                    prediction = predict_evolution(stats_data)
+                                                    st.session_state['evolution_prediction'] = prediction
+                                                    st.rerun()
+                                    
+                                    # Afficher un message explicatif si une prédiction existe
+                                    if prediction:
+                                        st.markdown("""
+                                            <div style="margin-top: 5px; font-size: 0.7em; color: #bbb; text-align: center;">
+                                                ⚡ Valeurs en bleu = augmentations prédites lors d'une méga-évolution
+                                            </div>
+                                        """, unsafe_allow_html=True)
                     except Exception as e:
                         st.markdown("""
                             <div style="text-align: center; margin: 20px 0;">

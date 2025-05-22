@@ -1,0 +1,38 @@
+name: Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-playwright pytest-mock
+        playwright install
+    
+    - name: Run unit tests
+      run: |
+        pytest tests/test_streamlit_app.py -v
+    
+    - name: Start Streamlit server
+      run: |
+        streamlit run app/streamlit_app.py &
+        sleep 10  # Attendre que le serveur démarre
+    
+    - name: Run integration tests
+      run: |
+        pytest tests/e2e/test_streamlit_integration.py -v 
